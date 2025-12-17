@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Lock, ArrowLeft, Key } from 'lucide-react';
+import './ResetPassword.css';
 
 export default function ResetPassword() {
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
@@ -15,7 +19,12 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    if (!otp || otp.length !== 6) {
+      alert('Please enter a valid 6-digit OTP');
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
@@ -27,150 +36,76 @@ export default function ResetPassword() {
     }
 
     setIsLoading(true);
-    // Simulate API call
+    // Simulate API call - verify OTP and reset password
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
     setIsSubmitted(true);
-    console.log('Password reset completed for token:', token);
+    console.log('Password reset completed with OTP:', otp, 'for token:', token);
   };
 
   return (
-    <div 
-      className="auth-container"
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        background: '#f5f5f5'
-      }}
-    >
+    <div className="auth-container">
       {/* Left Section - Illustration */}
-      <div 
-        style={{
-          flex: '1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f5f5f5',
-          padding: '2rem',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '600px',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <img 
-            src="/login/Illustration.png" 
+      <div className="reset-password-illustration-section">
+        <div className="reset-password-illustration-container">
+          <img
+            src="/login/Illustration.png"
             alt="Reset Password Illustration"
-            style={{
-              width: '100%',
-              height: 'auto',
-              objectFit: 'contain',
-              maxHeight: '90vh'
-            }}
+            className="reset-password-illustration"
           />
         </div>
       </div>
 
       {/* Right Section - Reset Password Form */}
-      <div 
-        style={{
-          flex: '1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f5f5f5',
-          padding: '2rem'
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '450px',
-            background: '#ffffff',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            padding: '3rem'
-          }}
-        >
+      <div className="reset-password-form-section">
+        <div className="reset-password-form-container">
           {!isSubmitted ? (
             <>
               {/* Header */}
-              <div style={{ marginBottom: '2rem' }}>
-                <h1 style={{ 
-                  fontSize: '1.875rem', 
-                  fontWeight: '700', 
-                  color: '#124591',
-                  margin: 0,
-                  marginBottom: '0.5rem'
-                }}>
+              <div className="reset-password-header">
+                <h1 className="reset-password-title">
                   Reset Password
                 </h1>
-                <p style={{ 
-                  fontSize: '0.875rem', 
-                  color: '#6b7280',
-                  margin: 0
-                }}>
-                  Enter your new password below.
+                <p className="reset-password-description">
+                  Enter the OTP sent to your email and set your new password.
                 </p>
               </div>
 
               {/* Reset Password Form */}
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <form onSubmit={handleSubmit} className="reset-password-form">
+                {/* OTP Input */}
+                <div className="reset-password-input-group">
+                  <label htmlFor="otp" className="reset-password-label">
+                    OTP Code
+                  </label>
+                  <div className="reset-password-input-container">
+                    <Key className="reset-password-input-icon" />
+                    <input
+                      id="otp"
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      className="reset-password-input reset-password-otp-input"
+                      placeholder="000000"
+                      maxLength={6}
+                      required
+                    />
+                  </div>
+                </div>
+
                 {/* New Password Input */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label htmlFor="password" style={{ 
-                    fontSize: '0.875rem', 
-                    fontWeight: '500', 
-                    color: '#374151',
-                    marginBottom: '0.25rem'
-                  }}>
+                <div className="reset-password-input-group">
+                  <label htmlFor="password" className="reset-password-label">
                     New Password
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <Lock style={{ 
-                      position: 'absolute', 
-                      left: '1rem', 
-                      top: '50%', 
-                      transform: 'translateY(-50%)', 
-                      width: '1.25rem', 
-                      height: '1.25rem', 
-                      color: '#9ca3af',
-                      pointerEvents: 'none'
-                    }} />
+                  <div className="reset-password-input-container">
+                    <Lock className="reset-password-input-icon" />
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      style={{
-                        width: '100%',
-                        paddingLeft: '3rem',
-                        paddingRight: '3rem',
-                        paddingTop: '0.875rem',
-                        paddingBottom: '0.875rem',
-                        background: '#f3f4f6',
-                        border: 'none',
-                        borderRadius: '8px',
-                        outline: 'none',
-                        fontSize: '0.875rem',
-                        color: '#111827'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.background = '#e5e7eb';
-                        e.target.style.boxShadow = '0 0 0 3px rgba(18, 69, 145, 0.1)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.background = '#f3f4f6';
-                        e.target.style.boxShadow = 'none';
-                      }}
+                      className="reset-password-input reset-password-password-input"
                       placeholder="Enter new password"
                       required
                       minLength={8}
@@ -178,22 +113,7 @@ export default function ResetPassword() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      style={{
-                        position: 'absolute',
-                        right: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#9ca3af',
-                        padding: '0.25rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                      onMouseEnter={(e) => e.target.style.color = '#6b7280'}
-                      onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
+                      className="reset-password-password-toggle"
                     >
                       {showPassword ? (
                         <EyeOff style={{ width: '1.25rem', height: '1.25rem' }} />
@@ -205,52 +125,18 @@ export default function ResetPassword() {
                 </div>
 
                 {/* Confirm Password Input */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label htmlFor="confirmPassword" style={{ 
-                    fontSize: '0.875rem', 
-                    fontWeight: '500', 
-                    color: '#374151',
-                    marginBottom: '0.25rem'
-                  }}>
+                <div className="reset-password-input-group">
+                  <label htmlFor="confirmPassword" className="reset-password-label">
                     Confirm Password
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <Lock style={{ 
-                      position: 'absolute', 
-                      left: '1rem', 
-                      top: '50%', 
-                      transform: 'translateY(-50%)', 
-                      width: '1.25rem', 
-                      height: '1.25rem', 
-                      color: '#9ca3af',
-                      pointerEvents: 'none'
-                    }} />
+                  <div className="reset-password-input-container">
+                    <Lock className="reset-password-input-icon" />
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      style={{
-                        width: '100%',
-                        paddingLeft: '3rem',
-                        paddingRight: '3rem',
-                        paddingTop: '0.875rem',
-                        paddingBottom: '0.875rem',
-                        background: '#f3f4f6',
-                        border: 'none',
-                        borderRadius: '8px',
-                        outline: 'none',
-                        fontSize: '0.875rem',
-                        color: '#111827'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.background = '#e5e7eb';
-                        e.target.style.boxShadow = '0 0 0 3px rgba(18, 69, 145, 0.1)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.background = '#f3f4f6';
-                        e.target.style.boxShadow = 'none';
-                      }}
+                      className="reset-password-input reset-password-password-input"
                       placeholder="Confirm new password"
                       required
                       minLength={8}
@@ -258,22 +144,7 @@ export default function ResetPassword() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      style={{
-                        position: 'absolute',
-                        right: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#9ca3af',
-                        padding: '0.25rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                      onMouseEnter={(e) => e.target.style.color = '#6b7280'}
-                      onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
+                      className="reset-password-password-toggle"
                     >
                       {showConfirmPassword ? (
                         <EyeOff style={{ width: '1.25rem', height: '1.25rem' }} />
@@ -288,94 +159,35 @@ export default function ResetPassword() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    background: isLoading ? '#9ca3af' : '#124591',
-                    color: '#ffffff',
-                    padding: '0.875rem 1.5rem',
-                    borderRadius: '8px',
-                    fontWeight: '600',
-                    fontSize: '1rem',
-                    border: 'none',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    marginTop: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    opacity: isLoading ? 0.7 : 1
-                  }}
+                  className="reset-password-submit-button"
                 >
                   {isLoading ? 'Resetting...' : 'Reset Password'}
                 </button>
               </form>
             </>
           ) : (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{
-                  width: '4rem',
-                  height: '4rem',
-                  borderRadius: '50%',
-                  background: '#dcfce7',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 1rem'
-                }}>
-                  <Lock style={{ width: '2rem', height: '2rem', color: '#16a34a' }} />
-                </div>
-                <h1 style={{ 
-                  fontSize: '1.875rem', 
-                  fontWeight: '700', 
-                  color: '#124591',
-                  margin: 0,
-                  marginBottom: '0.5rem'
-                }}>
-                  Password Reset Successful
-                </h1>
-                <p style={{ 
-                  fontSize: '0.875rem', 
-                  color: '#6b7280',
-                  margin: 0
-                }}>
-                  Your password has been successfully reset. You can now log in with your new password.
-                </p>
+            <div className="reset-password-success">
+              <div className="reset-password-success-icon-container">
+                <Lock className="reset-password-success-icon" />
               </div>
+              <h1 className="reset-password-title">
+                Password Reset Successful
+              </h1>
+              <p className="reset-password-description">
+                Your password has been successfully reset. You can now log in with your new password.
+              </p>
               <button
                 type="button"
-                onClick={() => window.location.href = '/login'}
-                style={{
-                  width: '100%',
-                  background: '#124591',
-                  color: '#ffffff',
-                  padding: '0.875rem 1.5rem',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  marginTop: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem'
-                }}
+                onClick={() => navigate('/login')}
+                className="reset-password-success-button"
               >
+                <ArrowLeft style={{ width: '1rem', height: '1rem' }} />
                 Go to Login
               </button>
             </div>
           )}
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 968px) {
-          .auth-container {
-            flex-direction: column !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
