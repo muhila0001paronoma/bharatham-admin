@@ -1,0 +1,220 @@
+/* Theory Mobile Preview Styles */
+.theory-mobile-preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0.5rem;
+  padding-top: 0.75rem;
+}
+
+.theory-mobile-frame {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  max-height: 540px;
+  aspect-ratio: 9 / 16;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  border: 6px solid #1f2937;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+/* Status Bar */
+.theory-mobile-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  background: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #000000;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.theory-mobile-status-time {
+  font-weight: 600;
+}
+
+.theory-mobile-status-icons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.theory-mobile-status-icon {
+  width: 4px;
+  height: 4px;
+  background: #000000;
+  border-radius: 50%;
+}
+
+/* Mobile Content */
+.theory-mobile-content {
+  flex: 1;
+  background: #F9EDEF;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  min-height: 0;
+}
+
+/* Header */
+.theory-mobile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+}
+
+.theory-mobile-back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.theory-mobile-back-button:hover {
+  background: rgba(122, 77, 58, 0.1);
+}
+
+.theory-mobile-back-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.theory-mobile-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #7A4D3A;
+  flex: 1;
+  padding-left: 0.375rem;
+  line-height: 1.3;
+}
+
+/* Image */
+.theory-mobile-image-container {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+}
+
+.theory-mobile-image {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Description */
+.theory-mobile-description {
+  font-size: 0.8125rem;
+  color: #555555;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* Notes Container */
+.theory-mobile-notes-container {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: #F5F5F5;
+  border-radius: 10px;
+  border-left: 3px solid #B25B2A;
+  flex-shrink: 0;
+}
+
+.theory-mobile-notes-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #7A4D3A;
+  margin-bottom: 0.5rem;
+}
+
+.theory-mobile-notes-text {
+  font-size: 0.8125rem;
+  color: #555555;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.theory-mobile-notes-empty {
+  opacity: 0.6;
+}
+
+.theory-mobile-notes-placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Complete Button */
+.theory-mobile-complete-button {
+  background: #BC6135;
+  padding: 0.625rem;
+  border-radius: 8px;
+  text-align: center;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(188, 97, 53, 0.2);
+  user-select: none;
+}
+
+.theory-mobile-complete-button:hover {
+  background: #a5522a;
+  box-shadow: 0 4px 8px rgba(188, 97, 53, 0.3);
+  transform: translateY(-1px);
+}
+
+.theory-mobile-complete-button-done {
+  background: #10b981;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+  opacity: 1;
+}
+
+.theory-mobile-complete-button-done:hover {
+  background: #10b981;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+  transform: none;
+}
+
+/* Scrollbar Styling */
+.theory-mobile-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.theory-mobile-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theory-mobile-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.theory-mobile-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
