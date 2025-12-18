@@ -3,7 +3,7 @@ import Login from './components/auth/Login';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/dashboard/Dashboard';
 import Theory from './pages/Theory';
 import Techniques from './pages/Techniques';
 import Quiz from './pages/Quiz';

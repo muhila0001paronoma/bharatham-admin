@@ -21,7 +21,6 @@ const pageTitles = {
   '/teachers': 'Teachers',
   '/teachers/details': 'Teachers Details',
   '/teachers/choreography': 'Choreography Videos',
-  '/teachers/choreography': 'Choreography Videos',
   '/courses': 'Courses',
   '/courses/details': 'Course Details',
   '/courses/enroll': 'User Enroll',
