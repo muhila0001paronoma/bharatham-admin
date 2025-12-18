@@ -1,0 +1,109 @@
+/* Theory Topic List View Styles */
+.theory-topic-list-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+}
+
+.theory-topic-list-header .theory-mobile-back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.theory-topic-list-header .theory-mobile-back-button:hover {
+  background: rgba(122, 77, 58, 0.1);
+}
+
+.theory-topic-list-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #7A4D3A;
+  flex: 1;
+  padding-left: 0.375rem;
+}
+
+.theory-topic-list-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  border: 1px solid #BC6135;
+  border-radius: 10px;
+  background: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.theory-topic-list-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  color: #1f2937;
+  background: transparent;
+}
+
+.theory-topic-list-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.theory-topic-list-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.theory-topic-list-card {
+  background: #B25B2A;
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.theory-topic-list-card-image {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
+}
+
+.theory-topic-list-card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.theory-topic-list-card-desc {
+  font-size: 0.8125rem;
+  color: #F2DBD7;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.theory-topic-list-card-button {
+  background: #F2DBD7;
+  border-radius: 8px;
+  padding: 0.375rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #7A4D3A;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theory-topic-list-card-button:hover {
+  background: #e8c9c3;
+  transform: translateY(-1px);
+}
+
