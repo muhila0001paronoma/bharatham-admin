@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 import {
@@ -48,6 +48,20 @@ export default function Sidebar() {
     courses: false,
     users: false
   });
+
+  // Auto-expand the dropdown that matches the current route
+  useEffect(() => {
+    setExpandedItems((prev) => {
+      const next = { ...prev };
+      ['quiz', 'teachers', 'courses', 'users'].forEach((id) => {
+        const item = menuItems.find((m) => m.id === id);
+        const hasActiveSub =
+          item?.subItems?.some((sub) => location.pathname.startsWith(sub.path));
+        next[id] = hasActiveSub || (id === 'quiz' && location.pathname.startsWith('/quiz'));
+      });
+      return next;
+    });
+  }, [location.pathname]);
 
   const toggleExpand = (item) => {
     setExpandedItems(prev => {

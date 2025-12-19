@@ -202,6 +202,129 @@ export const teachersData = {
 };
 
 export const quizData = {
+  theory: {
+    subTopics: [
+      'Anjali',
+      'Varnam',
+      'Nritta',
+      'Sthanas',
+      'Natya',
+      'Abhinaya',
+      'Alarippu',
+      'Adavus'
+    ],
+    questions: [
+      {
+        id: 'Q1',
+        question: 'Anjali mudra is primarily used to convey which of these?',
+        answers: [
+          { text: 'Offering respect or greeting', correct: true },
+          { text: 'Depicting a tree' },
+          { text: 'Representing a bow' },
+          { text: 'Showing denial' }
+        ],
+        note: 'Anjali mudra is a gesture of respect, greeting, or devotion and is widely used at the start and end of performances.'
+      },
+      {
+        id: 'Q2',
+        question: 'Anjali mudra is primarily used to convey which of these?',
+        answers: [
+          { text: 'Offering respect or greeting', correct: true },
+          { text: 'Depicting a tree' },
+          { text: 'Representing a bow' },
+          { text: 'Showing denial' }
+        ],
+        note: 'Anjali mudra is a gesture of respect, greeting, or devotion and is widely used at the start and end of performances.'
+      }
+    ]
+  },
+  technique: {
+    subTopics: [
+      'Mudras',
+      'Varnam',
+      'Nritta',
+      'Sthanas',
+      'Natya',
+      'Abhinaya',
+      'Alarippu',
+      'Adavus'
+    ],
+    questions: [
+      {
+        id: 'Q1',
+        question: 'Anjali mudra is primarily used to convey which of these?',
+        answers: [
+          { text: 'Offering respect or greeting', correct: true },
+          { text: 'Depicting a tree' },
+          { text: 'Representing a bow' },
+          { text: 'Showing denial' }
+        ],
+        note: 'Anjali mudra is a gesture of respect, greeting, or devotion and is widely used at the start and end of performances.'
+      },
+      {
+        id: 'Q2',
+        question: 'Anjali mudra is primarily used to convey which of these?',
+        answers: [
+          { text: 'Offering respect or greeting', correct: true },
+          { text: 'Depicting a tree' },
+          { text: 'Representing a bow' },
+          { text: 'Showing denial' }
+        ],
+        note: 'Anjali mudra is a gesture of respect, greeting, or devotion and is widely used at the start and end of performances.'
+      }
+    ]
+  },
+  results: [
+    { id: 1, topic: 'Anjal', type: 'Theory', email: 'bavi003@gmail.com', total: 5, correct: 4, result: '80%', grade: 'A', attempt: 2, date: '2025-12-04 23:52:11', active: true },
+    { id: 2, topic: 'Garuda', type: 'Techniques', email: 'muhila@gmail.com', total: 7, correct: 3, result: '42.85%', grade: 'S', attempt: 1, date: '2025-12-05 10:25:02', active: true },
+    { id: 3, topic: 'Anjal', type: 'Theory', email: 'bavi003@gmail.com', total: 5, correct: 4, result: '80%', grade: 'A', attempt: 2, date: '2025-11-04 00:00:00', active: true },
+    { id: 4, topic: 'Anjal', type: 'Theory', email: 'bavi003@gmail.com', total: 5, correct: 4, result: '80%', grade: 'A', attempt: 2, date: '2025-11-04 00:00:00', active: true },
+    { id: 5, topic: 'Anjal', type: 'Theory', email: 'bavi003@gmail.com', total: 5, correct: 4, result: '80%', grade: 'A', attempt: 2, date: '2025-11-04 00:00:00', active: true },
+    { id: 6, topic: 'Anjal', type: 'Theory', email: 'bavi003@gmail.com', total: 5, correct: 4, result: '80%', grade: 'A', attempt: 2, date: '2025-11-04 00:00:00', active: true },
+    { id: 7, topic: 'Garuda', type: 'Techniques', email: 'muhila@gmail.com', total: 7, correct: 3, result: '42.85%', grade: 'S', attempt: 1, date: '2025-12-05 10:25:02', active: true },
+    { id: 8, topic: 'Garuda', type: 'Techniques', email: 'muhila@gmail.com', total: 7, correct: 3, result: '42.85%', grade: 'S', attempt: 1, date: '2025-12-05 10:25:02', active: true },
+    { id: 9, topic: 'Garuda', type: 'Techniques', email: 'muhila@gmail.com', total: 7, correct: 3, result: '42.85%', grade: 'S', attempt: 1, date: '2025-12-05 10:25:02', active: true }
+  ]
+};
+
+/**
+ * Get theory quiz sub topics
+ * @returns {Promise<string[]>} Array of theory quiz sub topic names
+ */
+export const getTheoryQuizSubTopics = async () => {
+  return quizData.theory.subTopics;
+};
+
+/**
+ * Get theory quiz questions
+ * @returns {Promise<Array>} Array of theory quiz question objects
+ */
+export const getTheoryQuizQuestions = async () => {
+  return quizData.theory.questions;
+};
+
+/**
+ * Get technique quiz sub topics
+ * @returns {Promise<string[]>} Array of technique quiz sub topic names
+ */
+export const getTechniqueQuizSubTopics = async () => {
+  return quizData.technique.subTopics;
+};
+
+/**
+ * Get technique quiz questions
+ * @returns {Promise<Array>} Array of technique quiz question objects
+ */
+export const getTechniqueQuizQuestions = async () => {
+  return quizData.technique.questions;
+};
+
+/**
+ * Get quiz results
+ * @returns {Promise<Array>} Array of quiz result objects
+ */
+export const getQuizResults = async () => {
+  return quizData.results;
 };
 
 export const techniquesData = {
