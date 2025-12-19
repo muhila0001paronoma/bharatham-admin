@@ -19,19 +19,6 @@ export default function Theory() {
   const [selectedTopicData, setSelectedTopicData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-
-  // TODO: Replace with API calls when integrating with backend
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const topics = await getTheoryTopics();
-  //     const details = await getTheoryDetails();
-  //     setTheoryTopics(topics);
-  //     setTheoryDetails(details);
-  //   };
-  //   fetchData();
-  // }, []);
-
-  // Filter data based on search query
   const filteredData = theoryDetails.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -43,7 +30,6 @@ export default function Theory() {
     );
   });
 
-  // Table columns configuration
   const columns = [
     {
       key: 'id',
@@ -122,7 +108,6 @@ export default function Theory() {
 
   const handleSaveTopic = (formData) => {
     if (selectedTopicData) {
-      // Update existing topic
       setTheoryTopics(prev => 
         prev.map(topic => 
           topic === selectedTopicData 
@@ -131,7 +116,6 @@ export default function Theory() {
         )
       );
     } else {
-      // Add new topic at the beginning
       setTheoryTopics(prev => [formData.topicName, ...prev]);
     }
     setIsTopicModalOpen(false);
@@ -155,7 +139,6 @@ export default function Theory() {
 
   const handleSaveTheory = (formData) => {
     if (selectedTheoryData) {
-      // Update existing theory detail
       setTheoryDetails(prev => 
         prev.map(item => 
           item.id === selectedTheoryData.id 
@@ -164,7 +147,6 @@ export default function Theory() {
         )
       );
     } else {
-      // Add new theory detail
       const newTheory = {
         id: theoryDetails.length + 1,
         index: theoryDetails.length + 1,
@@ -188,7 +170,6 @@ export default function Theory() {
 
   const handleConfirmDelete = () => {
     if (itemToDelete) {
-      // Perform delete operation
       setTheoryDetails(prev => prev.filter(item => item.id !== itemToDelete.id));
       setItemToDelete(null);
     }
@@ -200,18 +181,14 @@ export default function Theory() {
   };
 
   const handleFilter = () => {
-    // Handle filter
     console.log('Filter');
   };
-
-  // Calculate stats
   const totalTopics = theoryTopics.length;
   const totalDetails = theoryDetails.length;
   const activeDetails = theoryDetails.filter(item => item.active).length;
 
   return (
     <div className="theory-page">
-      {/* Page Header */}
       <div className="theory-page-header">
         <div className="theory-page-header-content">
           <div className="theory-page-header-left">
@@ -220,7 +197,7 @@ export default function Theory() {
             </div>
             <div>
               <h1 className="theory-page-header-title">Theory Management</h1>
-              <p className="theory-page-header-subtitle">Manage theory topics and details for the Bharatham platform</p>
+              <p className="theory-page-header-subtitle">Manage theory topics and details for the Bharatham app</p>
             </div>
           </div>
           <div className="theory-page-header-stats">
@@ -255,7 +232,6 @@ export default function Theory() {
         </div>
       </div>
 
-      {/* Theory Topics Section */}
       <div className="theory-section">
         <div className="theory-section-header">
           <h2 className="theory-section-title">Theory Topics</h2>
@@ -290,7 +266,6 @@ export default function Theory() {
         </div>
       </div>
 
-      {/* Theory Details Section */}
       <div className="theory-section">
         <div className="theory-section-header">
           <h2 className="theory-section-title">Theory Details</h2>
@@ -336,7 +311,6 @@ export default function Theory() {
         </div>
       </div>
 
-      {/* Theory Modal */}
       <TheoryModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -345,7 +319,6 @@ export default function Theory() {
         topics={theoryTopics}
       />
 
-      {/* Topic Modal */}
       <TopicModal
         isOpen={isTopicModalOpen}
         onClose={handleCloseTopicModal}
@@ -354,7 +327,6 @@ export default function Theory() {
         existingTopics={theoryTopics}
       />
 
-      {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}

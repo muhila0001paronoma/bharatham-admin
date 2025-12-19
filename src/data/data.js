@@ -1,35 +1,12 @@
-// Common Data File
-// TODO: Replace with API calls when integrating with backend
-
 import anjaliImage from '../assets/anjali.png';
 
-/**
- * Theory Data
- */
-
-/**
- * Get all theory topics
- * @returns {Promise<string[]>} Array of theory topic names
- */
 export const getTheoryTopics = async () => {
-  // TODO: Replace with actual API call
-  // Example: return await fetch('/api/theory/topics').then(res => res.json());
-  
   return theoryData.topics;
 };
 
-/**
- * Get all theory details
- * @returns {Promise<Array>} Array of theory detail objects
- */
 export const getTheoryDetails = async () => {
-  // TODO: Replace with actual API call
-  // Example: return await fetch('/api/theory/details').then(res => res.json());
-  
   return theoryData.details;
 };
-
-// Synchronous data exports (for current use)
 export const theoryData = {
   topics: [
     'Mudras',
@@ -215,99 +192,39 @@ export const theoryData = {
   ]
 };
 
-/**
- * Users Data
- * TODO: Add user data structure and API functions
- */
 export const usersData = {
-  // Add user data here
 };
 
-/**
- * Courses Data
- * TODO: Add course data structure and API functions
- */
 export const coursesData = {
-  // Add course data here
 };
 
-/**
- * Teachers Data
- * TODO: Add teacher data structure and API functions
- */
 export const teachersData = {
-  // Add teacher data here
 };
 
-/**
- * Quiz Data
- * TODO: Add quiz data structure and API functions
- */
 export const quizData = {
-  // Add quiz data here
 };
 
-/**
- * Techniques Data
- * TODO: Add techniques data structure and API functions
- */
 export const techniquesData = {
-  // Add techniques data here
 };
 
-/**
- * Workouts Data
- * TODO: Add workouts data structure and API functions
- */
 export const workoutsData = {
-  // Add workouts data here
 };
 
-/**
- * Games Data
- * TODO: Add games data structure and API functions
- */
 export const gamesData = {
-  // Add games data here
 };
 
-/**
- * Challenges Data
- * TODO: Add challenges data structure and API functions
- */
 export const challengesData = {
-  // Add challenges data here
 };
 
-/**
- * Online Events Data
- * TODO: Add online events data structure and API functions
- */
 export const onlineEventsData = {
-  // Add online events data here
 };
 
-/**
- * Chats Data
- * TODO: Add chats data structure and API functions
- */
 export const chatsData = {
-  // Add chats data here
 };
 
-/**
- * Reels Data
- * TODO: Add reels data structure and API functions
- */
 export const reelsData = {
-  // Add reels data here
 };
 
-/**
- * Class Schedule Data
- * TODO: Add class schedule data structure and API functions
- */
 export const classScheduleData = {
-  // Add class schedule data here
 };
 

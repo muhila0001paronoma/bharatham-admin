@@ -19,7 +19,6 @@ export default function TheoryMobilePreview({ formData }) {
     setShowListView(false);
   };
 
-  // Show topic list view when back is clicked
   if (showListView) {
     return (
       <TheoryTopicListView 

@@ -3,8 +3,6 @@ import { ArrowLeft } from 'lucide-react';
 import './TopicMobilePreview.css';
 
 export default function TopicMobilePreview({ formData, existingTopics = [] }) {
-  // Combine existing topics with the new topic being created/edited
-  // Show new topic first in the list
   const allTopics = formData.topicName 
     ? [formData.topicName, ...existingTopics.filter(t => t !== formData.topicName)]
     : existingTopics;

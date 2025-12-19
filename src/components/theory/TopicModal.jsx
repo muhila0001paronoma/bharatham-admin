@@ -11,14 +11,12 @@ export default function TopicModal({ isOpen, onClose, onSave, topicData = null, 
   });
 
   useEffect(() => {
-    // Prevent body scroll when modal is open
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
