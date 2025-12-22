@@ -1,23 +1,27 @@
-/* Theory Page Styles */
-
-.theory-page {
+.workout-page {
   display: flex;
   flex-direction: column;
   gap: 2rem;
   min-height: calc(100vh - 200px);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-/* Page Header */
-.theory-page-header {
+.workout-page-header {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.theory-page-header::before {
+.workout-page-header::before {
   content: '';
   position: absolute;
   top: 0;
@@ -28,22 +32,25 @@
   pointer-events: none;
 }
 
-.theory-page-header-content {
+.workout-page-header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.theory-page-header-left {
+.workout-page-header-left {
   display: flex;
   align-items: center;
   gap: 1.25rem;
 }
 
-.theory-page-header-icon {
+.workout-page-header-icon {
   width: 64px;
   height: 64px;
   background: rgba(255, 255, 255, 0.2);
@@ -56,7 +63,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.theory-page-header-title {
+.workout-page-header-title {
   font-size: 1.875rem;
   font-weight: 700;
   color: #ffffff;
@@ -65,19 +72,19 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.theory-page-header-subtitle {
+.workout-page-header-subtitle {
   font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   opacity: 0.95;
 }
 
-.theory-page-header-stats {
+.workout-page-header-stats {
   display: flex;
   gap: 1rem;
 }
 
-.theory-page-stat-card {
+.workout-page-stat-card {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -90,13 +97,13 @@
   transition: all 0.3s ease;
 }
 
-.theory-page-stat-card:hover {
+.workout-page-stat-card:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.theory-page-stat-icon {
+.workout-page-stat-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -106,34 +113,34 @@
   color: #ffffff;
 }
 
-.theory-page-stat-icon-primary {
+.workout-page-stat-icon-primary {
   background: rgba(59, 130, 246, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.theory-page-stat-icon-success {
+.workout-page-stat-icon-success {
   background: rgba(16, 185, 129, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.theory-page-stat-icon-info {
+.workout-page-stat-icon-info {
   background: rgba(139, 92, 246, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.theory-page-stat-content {
+.workout-page-stat-content {
   display: flex;
   flex-direction: column;
 }
 
-.theory-page-stat-value {
+.workout-page-stat-value {
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
 }
 
-.theory-page-stat-label {
+.workout-page-stat-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
@@ -141,35 +148,38 @@
   font-weight: 500;
 }
 
-.theory-section {
+.workout-section {
   background: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.theory-section-header {
+.workout-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.theory-section-title {
+.workout-section-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
 }
 
-/* Theory Topics Section */
-.theory-topics-container {
+.workout-tabs-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
 }
 
-.theory-topic-tag {
+.workout-tab-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -184,39 +194,38 @@
   transition: all 0.2s;
 }
 
-.theory-topic-tag:hover {
+.workout-tab-tag:hover {
   background: #e5e7eb;
   border-color: #d1d5db;
 }
 
-.theory-topic-tag-active {
+.workout-tab-tag-active {
   background: #ede9fe;
   border-color: #a78bfa;
   color: #7c3aed;
 }
 
-.theory-topic-edit-icon {
+.workout-tab-edit-icon {
   width: 14px;
   height: 14px;
   opacity: 0.7;
 }
 
-.theory-topic-tag:hover .theory-topic-edit-icon {
+.workout-tab-tag:hover .workout-tab-edit-icon {
   opacity: 1;
 }
 
-/* Theory Details Section */
-.theory-details-toolbar {
+.workout-videos-toolbar {
   margin-bottom: 1rem;
 }
 
-.theory-search-filter {
+.workout-search-filter {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.theory-filter-button {
+.workout-filter-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,24 +239,24 @@
   color: #6b7280;
 }
 
-.theory-filter-button:hover {
+.workout-filter-button:hover {
   background: #f9fafb;
   border-color: #9ca3af;
   color: #374151;
 }
 
-.theory-filter-icon {
+.workout-filter-icon {
   width: 18px;
   height: 18px;
 }
 
-.theory-search-input-wrapper {
+.workout-search-input-wrapper {
   position: relative;
   flex: 1;
   max-width: 400px;
 }
 
-.theory-search-icon {
+.workout-search-icon {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -258,7 +267,7 @@
   pointer-events: none;
 }
 
-.theory-search-input {
+.workout-search-input {
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 2.75rem;
   border: 1px solid #d1d5db;
@@ -268,18 +277,17 @@
   transition: all 0.2s;
 }
 
-.theory-search-input:focus {
+.workout-search-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.theory-search-input::placeholder {
+.workout-search-input::placeholder {
   color: #9ca3af;
 }
 
-/* Buttons */
-.theory-button {
+.workout-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -292,41 +300,42 @@
   transition: all 0.2s;
 }
 
-.theory-button-primary {
+.workout-button-primary {
   background: #3b82f6;
   color: #ffffff;
 }
 
-.theory-button-primary:hover {
+.workout-button-primary:hover {
   background: #2563eb;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.theory-button-icon {
+.workout-button-icon {
   width: 16px;
   height: 16px;
 }
 
-/* Table Container */
-.theory-table-container {
+.workout-table-container {
   margin-top: 1rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 
-.theory-table-images {
-  display: flex;
-  gap: 0.5rem;
+.workout-table-url {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
-.theory-table-image {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
-}
-
-.theory-table-notes {
-  max-width: 300px;
+.workout-table-description {
+  max-width: 350px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -334,7 +343,50 @@
   font-size: 0.875rem;
 }
 
-.theory-status {
+.workout-table-icon {
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workout-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.workout-table-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.workout-table-action-edit {
+  color: #3b82f6;
+}
+
+.workout-table-action-edit:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.workout-table-action-delete {
+  color: #ef4444;
+}
+
+.workout-table-action-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.workout-status {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -343,196 +395,89 @@
   text-transform: capitalize;
 }
 
-.theory-status-active {
+.workout-status-active {
   background: #d1fae5;
   color: #065f46;
 }
 
-.theory-status-inactive {
+.workout-status-inactive {
   background: #fee2e2;
   color: #991b1b;
 }
 
-/* Page Footer */
-.theory-page-footer {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-top: auto;
-  border-top: 2px solid #f3f4f6;
-}
-
-.theory-page-footer-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 3rem;
-  margin-bottom: 1.5rem;
-}
-
-.theory-page-footer-left {
-  flex: 1;
-  max-width: 400px;
-}
-
-.theory-page-footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  color: #3b82f6;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.theory-page-footer-text {
-  font-size: 0.875rem;
-  color: #6b7280;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.theory-page-footer-right {
-  flex: 1;
-}
-
-.theory-page-footer-links {
-  display: flex;
-  gap: 3rem;
-}
-
-.theory-page-footer-link-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.theory-page-footer-link-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.theory-page-footer-link-item {
-  font-size: 0.875rem;
-  color: #6b7280;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.theory-page-footer-link-item:hover {
-  color: #3b82f6;
-}
-
-.theory-page-footer-bottom {
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  text-align: center;
-}
-
-.theory-page-footer-copyright {
-  font-size: 0.8125rem;
-  color: #9ca3af;
-  margin: 0;
-}
-
-/* Responsive Design */
 @media (max-width: 1024px) {
-  .theory-page-header-content {
+  .workout-page-header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 1.5rem;
   }
 
-  .theory-page-header-stats {
+  .workout-page-header-stats {
     width: 100%;
     justify-content: space-between;
   }
 
-  .theory-page-stat-card {
+  .workout-page-stat-card {
     flex: 1;
     min-width: auto;
-  }
-
-  .theory-page-footer-content {
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .theory-page-footer-links {
-    width: 100%;
-    justify-content: space-between;
   }
 }
 
 @media (max-width: 768px) {
-  .theory-page-header {
+  .workout-page-header {
     padding: 1.5rem;
   }
 
-  .theory-page-header-left {
+  .workout-page-header-left {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  .theory-page-header-icon {
+  .workout-page-header-icon {
     width: 56px;
     height: 56px;
   }
 
-  .theory-page-header-title {
+  .workout-page-header-title {
     font-size: 1.5rem;
   }
 
-  .theory-page-header-stats {
+  .workout-page-header-stats {
     flex-direction: column;
     width: 100%;
   }
 
-  .theory-page-stat-card {
+  .workout-page-stat-card {
     width: 100%;
   }
 
-  .theory-section {
+  .workout-section {
     padding: 1rem;
   }
 
-  .theory-section-header {
+  .workout-section-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  .theory-button {
+  .workout-button {
     width: 100%;
     justify-content: center;
   }
 
-  .theory-search-input-wrapper {
+  .workout-search-input-wrapper {
     max-width: 100%;
   }
 
-  .theory-topics-container {
+  .workout-tabs-container {
     gap: 0.5rem;
   }
 
-  .theory-topic-tag {
+  .workout-tab-tag {
     font-size: 0.8125rem;
     padding: 0.4375rem 0.875rem;
-  }
-
-  .theory-page-footer {
-    padding: 1.5rem;
-  }
-
-  .theory-page-footer-links {
-    flex-direction: column;
-    gap: 2rem;
   }
 }
 
