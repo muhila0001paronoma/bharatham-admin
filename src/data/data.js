@@ -328,9 +328,239 @@ export const getQuizResults = async () => {
 };
 
 export const techniquesData = {
+  topics: [
+    'Body Postures',
+    'Face Expressions',
+    'Hand Mudras'
+  ],
+  details: [
+    {
+      id: 1,
+      name: 'Tribhanga',
+      description: 'Three-bend posture showing grace',
+      keyPoints: 'Tribhanga is a graceful S-shaped posture where the body bends at three points - neck, waist, and knee. This classical pose emphasizes elegance and fluidity in Bharatanatyam. The posture requires balance and control, with the weight distributed evenly across both legs. It is commonly used to depict feminine grace and beauty in dance compositions.',
+      topic: 'Body Postures',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 2,
+      name: 'Aramandi',
+      description: 'Half-sitting posture, the fundamental stance',
+      keyPoints: 'Aramandi is the basic half-sitting posture in Bharatanatyam. The knees are bent outward, creating a diamond shape with the legs. This foundational stance is used in most adavus and provides stability and balance. The weight is evenly distributed, and the torso remains upright.',
+      topic: 'Body Postures',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 3,
+      name: 'Samapada',
+      description: 'Straight standing posture',
+      keyPoints: 'Samapada is the basic standing posture with feet together. This simple yet important stance is used for salutations and transitions. The body remains straight and balanced, with equal weight on both feet.',
+      topic: 'Body Postures',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 4,
+      name: 'Abhinaya - Shringara',
+      description: 'Expression of love and romance',
+      keyPoints: 'Shringara is one of the nine rasas, representing love, romance, and beauty. The facial expression is soft and gentle, with a slight smile. The eyes convey tenderness and affection. This emotion is essential for portraying romantic narratives in dance.',
+      topic: 'Face Expressions',
+      level: 'Intermediate',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 5,
+      name: 'Abhinaya - Hasya',
+      description: 'Expression of joy and laughter',
+      keyPoints: 'Hasya represents joy, humor, and laughter. The expression is bright and cheerful, with eyes twinkling and a wide smile. The eyebrows are slightly raised, and the overall demeanor is light and playful. This rasa brings energy and positivity to performances.',
+      topic: 'Face Expressions',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 6,
+      name: 'Abhinaya - Karuna',
+      description: 'Expression of compassion and sorrow',
+      keyPoints: 'Karuna represents compassion, sorrow, and pathos. The facial expression is gentle and melancholic, with slightly drooping eyes and a soft, compassionate gaze. This emotion requires subtle control to convey deep feeling without losing grace.',
+      topic: 'Face Expressions',
+      level: 'Advanced',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 7,
+      name: 'Pataka Mudra',
+      description: 'The flag gesture, first of the single-hand mudras',
+      keyPoints: 'Pataka is the first of the 28 single-hand mudras. All fingers are extended and held together, with the thumb bent and touching the palm. This mudra represents a flag, cloud, forest, river, or the act of blessing. It is one of the most fundamental gestures in Bharatanatyam.',
+      topic: 'Hand Mudras',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 8,
+      name: 'Tripataka Mudra',
+      description: 'Three parts of a flag gesture',
+      keyPoints: 'Tripataka is formed by bending the ring finger while keeping other fingers extended. This mudra represents a crown, tree, arrow, flame, or the number three. It is essential for depicting divine attributes and heroic characters in classical dance narratives.',
+      topic: 'Hand Mudras',
+      level: 'Beginner',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 9,
+      name: 'Ardhapataka Mudra',
+      description: 'Half flag gesture',
+      keyPoints: 'Ardhapataka is formed by bending the little finger in Pataka. This mudra represents a leaf, writing board, knife, or flag at half-mast. It is used in various contexts to show objects or actions related to these symbols.',
+      topic: 'Hand Mudras',
+      level: 'Intermediate',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 10,
+      name: 'Kartarimukha Mudra',
+      description: 'Scissors face gesture',
+      keyPoints: 'Kartarimukha is formed by crossing the index and middle fingers, resembling scissors. This mudra represents separation, opposition, cutting, or conflict. It is used to show division, denial, or the act of cutting something.',
+      topic: 'Hand Mudras',
+      level: 'Intermediate',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 11,
+      name: 'Mayura Mudra',
+      description: 'Peacock gesture',
+      keyPoints: 'Mayura mudra represents a peacock, bird, or creeper. It is formed by joining the tips of all fingers together, creating a shape resembling a peacock\'s head. This elegant gesture is used to depict birds, flowers, or decorative elements in dance.',
+      topic: 'Hand Mudras',
+      level: 'Advanced',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    },
+    {
+      id: 12,
+      name: 'Ardhachandra Mudra',
+      description: 'Half moon gesture',
+      keyPoints: 'Ardhachandra represents the moon, prayer, or meditation. The fingers are extended and curved slightly, resembling a crescent moon. This mudra is used in devotional contexts and to show prayer or meditation poses.',
+      topic: 'Hand Mudras',
+      level: 'Intermediate',
+      imgUrl1: anjaliImage,
+      imgUrl2: anjaliImage,
+      imgUrl3: anjaliImage,
+      active: true
+    }
+  ]
+};
+
+export const getTechniqueTopics = async () => {
+  return techniquesData.topics;
+};
+
+export const getTechniqueDetails = async () => {
+  return techniquesData.details;
 };
 
 export const workoutsData = {
+  tabs: [
+    { tabName: 'Fitness', iconName: '💪' },
+    { tabName: 'Mobility', iconName: '🧘' },
+    { tabName: 'Strength', iconName: '🏋️' }
+  ],
+  videos: [
+    {
+      id: 1,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 2,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 3,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 4,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 5,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 6,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    },
+    {
+      id: 7,
+      videoUrl: 'https://www.youtube.com/watch?v=OIKOHzePJCA',
+      workoutTab: 'Fitness',
+      title: 'Basic Adavu Practice',
+      description: 'Learn and practice fundamental adavus including Tatta, Natta, and Kuditta Mettu with proper technique',
+      active: true
+    }
+  ]
+};
+
+export const getWorkoutTabs = async () => {
+  return workoutsData.tabs;
+};
+
+export const getWorkoutVideos = async () => {
+  return workoutsData.videos;
 };
 
 export const gamesData = {

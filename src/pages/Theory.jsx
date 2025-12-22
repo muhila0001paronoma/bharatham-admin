@@ -39,19 +39,43 @@ export default function Theory() {
       render: (value, row, index) => index + 1
     },
     {
-      key: 'image',
-      label: 'IMAGE',
+      key: 'images',
+      label: 'IMAGES',
       sortable: false,
-      width: '100px',
-      render: (value) => (
-        <img
-          src={value}
-          alt="Theory"
-          className="theory-table-image"
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/60x60?text=Image';
-          }}
-        />
+      width: '120px',
+      render: (value, row) => (
+        <div className="theory-table-images">
+          {row.imgUrl1 && (
+            <img
+              src={row.imgUrl1}
+              alt="Theory"
+              className="theory-table-image"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/40x40?text=Image';
+              }}
+            />
+          )}
+          {row.imgUrl2 && (
+            <img
+              src={row.imgUrl2}
+              alt="Theory"
+              className="theory-table-image"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/40x40?text=Image';
+              }}
+            />
+          )}
+          {row.imgUrl3 && (
+            <img
+              src={row.imgUrl3}
+              alt="Theory"
+              className="theory-table-image"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/40x40?text=Image';
+              }}
+            />
+          )}
+        </div>
       )
     },
     {

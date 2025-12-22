@@ -6,6 +6,10 @@ import TheoryTopicListView from './TheoryTopicListView';
 export default function TheoryMobilePreview({ formData }) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showListView, setShowListView] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const images = [formData.imgUrl1, formData.imgUrl2, formData.imgUrl3].filter(Boolean);
+  const displayImages = images.length > 0 ? images : [formData.image].filter(Boolean);
 
   const handleMarkComplete = () => {
     setIsCompleted(true);
@@ -31,7 +35,6 @@ export default function TheoryMobilePreview({ formData }) {
   return (
     <div className="theory-mobile-preview-container">
       <div className="theory-mobile-frame">
-        {/* Phone Status Bar */}
         <div className="theory-mobile-status-bar">
           <div className="theory-mobile-status-time">9:41</div>
           <div className="theory-mobile-status-icons">
@@ -41,9 +44,7 @@ export default function TheoryMobilePreview({ formData }) {
           </div>
         </div>
 
-        {/* Phone Content */}
         <div className="theory-mobile-content">
-          {/* Header */}
           <div className="theory-mobile-header">
             <div className="theory-mobile-back-button" onClick={handleBackClick}>
               <ArrowLeft size={18} color="#7A4D3A" />
@@ -53,17 +54,41 @@ export default function TheoryMobilePreview({ formData }) {
             </div>
           </div>
 
-          {/* Image */}
-          {formData.image && (
-            <div className="theory-mobile-image-container">
-              <img 
-                src={formData.image} 
-                alt={formData.subTopic || 'Theory'} 
-                className="theory-mobile-image"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
+          {displayImages.length > 0 && (
+            <div className="theory-mobile-image-section">
+              <div className="theory-mobile-main-image-container">
+                <img 
+                  src={displayImages[selectedImageIndex]} 
+                  alt={formData.subTopic || 'Theory'} 
+                  className="theory-mobile-main-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+
+              {displayImages.length > 1 && (
+                <div className="theory-mobile-thumbnail-container">
+                  {displayImages.map((img, index) => (
+                    <div
+                      key={index}
+                      className={`theory-mobile-thumbnail-wrapper ${
+                        selectedImageIndex === index ? 'theory-mobile-thumbnail-wrapper-active' : ''
+                      }`}
+                      onClick={() => setSelectedImageIndex(index)}
+                    >
+                      <img 
+                        src={img} 
+                        alt={`Thumbnail ${index + 1}`} 
+                        className="theory-mobile-thumbnail"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

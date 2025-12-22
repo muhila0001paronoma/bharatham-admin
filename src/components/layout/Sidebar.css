@@ -149,6 +149,11 @@
   height: 1.25rem;
   flex-shrink: 0;
   filter: brightness(0) saturate(100%) invert(22%) sepia(22%) saturate(787%) hue-rotate(348deg) brightness(92%) contrast(90%);
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-menu-item--active .sidebar-menu-icon {
+  filter: brightness(0) invert(1);
 }
 
 /* Menu item text */
