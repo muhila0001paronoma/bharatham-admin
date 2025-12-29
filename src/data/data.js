@@ -1,4 +1,5 @@
 import anjaliImage from '../assets/anjali.png';
+import gameAnjaliImage from '../assets/anjali.png';
 
 export const getTheoryTopics = async () => {
   return theoryData.topics;
@@ -666,9 +667,6 @@ export const getWorkoutVideos = async () => {
   return workoutsData.videos;
 };
 
-export const gamesData = {
-};
-
 export const challengesData = {
 };
 
@@ -682,5 +680,132 @@ export const reelsData = {
 };
 
 export const classScheduleData = {
+};
+
+export const gamesData = {
+  games: [
+    {
+      id: 1,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    },
+    {
+      id: 2,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    },
+    {
+      id: 3,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    },
+    {
+      id: 4,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    },
+    {
+      id: 5,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    },
+    {
+      id: 6,
+      gameName: 'Mudra Match',
+      description: 'Match the mudra gestures with their names',
+      imgUrl: anjaliImage,
+      totalPoints: 100,
+      timeDuration: 300,
+      mode: 'practice',
+      active: true
+    }
+  ],
+  questions: [
+    {
+      id: 1,
+      gameId: 1,
+      question: 'What is the primary hand gesture used in Bharatanatyam?',
+      imgUrl: anjaliImage,
+      answer1: 'Alapadma',
+      answer2: 'Shikhara',
+      answer3: 'Pataka',
+      answer4: 'Hamsasya',
+      correctAnswer: '1',
+      active: true
+    },
+    {
+      id: 2,
+      gameId: 1,
+      question: 'What is the primary hand gesture used in Bharatanatyam?',
+      imgUrl: anjaliImage,
+      answer1: 'Alapadma',
+      answer2: 'Shikhara',
+      answer3: 'Pataka',
+      answer4: 'Hamsasya',
+      correctAnswer: '1',
+      active: true
+    },
+    {
+      id: 3,
+      gameId: 1,
+      question: 'Which mudra represents a lotus?',
+      imgUrl: anjaliImage,
+      answer1: 'Alapadma',
+      answer2: 'Shikhara',
+      answer3: 'Pataka',
+      answer4: 'Hamsasya',
+      correctAnswer: '1',
+      active: true
+    },
+    {
+      id: 4,
+      gameId: 1,
+      question: 'What mudra is used to show a mountain?',
+      imgUrl: anjaliImage,
+      answer1: 'Alapadma',
+      answer2: 'Shikhara',
+      answer3: 'Pataka',
+      answer4: 'Hamsasya',
+      correctAnswer: '2',
+      active: true
+    },
+    {
+      id: 5,
+      gameId: 1,
+      question: 'Which gesture represents a flag?',
+      imgUrl: anjaliImage,
+      answer1: 'Alapadma',
+      answer2: 'Shikhara',
+      answer3: 'Pataka',
+      answer4: 'Hamsasya',
+      correctAnswer: '3',
+      active: true
+    }
+  ]
 };
 
