@@ -1,0 +1,495 @@
+/* Teacher Details Page Styles */
+
+.teachers-details-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    background-color: transparent;
+}
+
+.teachers-details-header {
+    margin-bottom: 0.5rem;
+}
+
+.teachers-details-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.teachers-details-container {
+    background-color: #fffbeb;
+    /* Light yellow background */
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: calc(100vh - 160px);
+}
+
+.teachers-details-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.teachers-details-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.teachers-details-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.teachers-details-search-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #6b7280;
+}
+
+.filter-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.625rem 0.75rem 0.625rem 2.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #1f2937;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.add-btn:hover {
+    background: #1d4ed8;
+}
+
+/* Image styling in table */
+.teacher-table-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    /* Square with slight rounding as per image */
+    background-color: #e2e8f0;
+    object-fit: cover;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.status-pill.active {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+/* DataTable Customizations */
+.teachers-details-table-wrapper .data-table-container {
+    border: none;
+    box-shadow: none;
+}
+
+.teachers-details-table-wrapper .data-table-header {
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.teachers-details-table-wrapper .data-table-cell {
+    padding: 1.25rem 1rem;
+    border-right: none;
+    font-weight: 500;
+    color: #334155;
+}
+
+.teachers-details-table-wrapper .data-table-row {
+    border-bottom: 1px solid #f8fafc;
+}
+
+.teachers-details-table-wrapper .data-table-row:hover {
+    background-color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+    .teachers-details-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .teachers-details-toolbar {
+        width: 100%;
+    }
+
+    .search-input-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Modal Styles */
+.teacher-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.teacher-modal-content {
+    background: #ffffff;
+    width: 95%;
+    max-width: 1000px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.teacher-modal-header {
+    padding: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+}
+
+.teacher-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.teacher-modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.teacher-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.teacher-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.teacher-modal-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.teacher-modal-preview-section {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    height: 100%;
+    min-height: 580px;
+}
+
+.teacher-preview-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.teacher-preview-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.teacher-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.teacher-modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.teacher-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.teacher-modal-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.teacher-modal-field input,
+.teacher-modal-field select,
+.teacher-modal-field textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.teacher-modal-field input:focus,
+.teacher-modal-field select:focus,
+.teacher-modal-field textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background: #f8fafc;
+}
+
+.teacher-modal-actions {
+    padding: 1.5rem;
+    border-top: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    background: #ffffff;
+}
+
+.modal-btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-btn.cancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.modal-btn.cancel:hover {
+    background: #e2e8f0;
+}
+
+.modal-btn.save {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+
+.modal-btn.save:hover {
+    background: #1d4ed8;
+}
+
+/* Image Upload Placeholder in Modal */
+.image-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.image-upload-wrapper:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.upload-icon-box {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.upload-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.upload-text span:first-child {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.upload-text span:last-child {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+    .teacher-modal-body {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+
+    .teacher-modal-preview-section {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .teacher-modal-row {
+        grid-template-columns: 1fr;
+    }
+}
