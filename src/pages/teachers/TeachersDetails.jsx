@@ -183,19 +183,21 @@ const TeachersDetails = () => {
             <h3 className="card-title">Teacher Details</h3>
 
             <div className="teachers-details-toolbar">
-              <button className="filter-btn" title="Filter">
-                <Filter size={18} />
-              </button>
+              <div className="teachers-details-search-filter">
+                <button className="filter-btn" title="Filter">
+                  <Filter size={18} />
+                </button>
 
-              <div className="search-wrapper">
-                <Search size={18} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
+                <div className="search-input-wrapper">
+                  <Search size={18} className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
               </div>
 
               <button className="add-btn" onClick={() => handleOpenModal('add')}>
