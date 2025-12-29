@@ -260,7 +260,7 @@ export default function Workouts() {
             <div className="workout-page-header-icon">
               <Dumbbell size={28} />
             </div>
-            <div>
+    <div>
               <h1 className="workout-page-header-title">Workout Management</h1>
               <p className="workout-page-header-subtitle">Manage workout tabs and videos for the Bharatham app</p>
             </div>
