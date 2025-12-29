@@ -1,5 +1,6 @@
 import anjaliImage from '../assets/anjali.png';
 import gameAnjaliImage from '../assets/anjali.png';
+import onlineEventImage from '../assets/online-event.png';
 
 export const getTheoryTopics = async () => {
   return theoryData.topics;
@@ -565,9 +566,172 @@ export const getWorkoutVideos = async () => {
 };
 
 export const challengesData = {
+  challenges: [
+    {
+      id: 1,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 2,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 3,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 4,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 5,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 6,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 7,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 8,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    },
+    {
+      id: 9,
+      challengeName: 'Daily Mudra Challenge',
+      shortDescription: 'Master 10 mudras in a week',
+      explanation: 'This challenge focuses on learning and perfecting 10 fundamental mudras used in Bharatanatyam. Practice daily for 10 minutes to master each gesture and improve your hand expressions.',
+      startDate: '2025-11-04 00:00:00',
+      endDate: '2025-12-04 00:00:00',
+      duration: '10 Minutes',
+      totalPoints: 100,
+      active: true
+    }
+  ]
 };
 
 export const onlineEventsData = {
+  events: [
+    {
+      id: 1,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    },
+    {
+      id: 2,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    },
+    {
+      id: 3,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    },
+    {
+      id: 4,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    },
+    {
+      id: 5,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    },
+    {
+      id: 6,
+      eventName: 'Bharatanatyam Workshop',
+      eventDateTime: '2025-12-15 10:00:00',
+      description: 'Learn the fundamentals of Bharatanatyam dance',
+      mode: 'Online',
+      totalAmount: 24999,
+      imgUrl: onlineEventImage,
+      active: true
+    }
+  ]
 };
 
 export const chatsData = {
