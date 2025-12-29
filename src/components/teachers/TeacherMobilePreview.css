@@ -1,0 +1,224 @@
+.teacher-mobile-preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.teacher-mobile-frame {
+    width: 280px;
+    height: 560px;
+    background: #ffffff;
+    border-radius: 32px;
+    border: 8px solid #1e293b;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-mobile-status-bar {
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.teacher-mobile-status-icons {
+    display: flex;
+    gap: 4px;
+}
+
+.teacher-mobile-status-icon-cellular,
+.teacher-mobile-status-icon-wifi,
+.teacher-mobile-status-icon-battery {
+    width: 12px;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 1px;
+}
+
+.teacher-mobile-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.teacher-mobile-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.teacher-mobile-header-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.teacher-mobile-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Profile Card */
+.teacher-mobile-profile-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.teacher-mobile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+    background-color: #e2e8f0;
+    border: 4px solid #f8fafc;
+}
+
+.teacher-mobile-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.teacher-mobile-position {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2563eb;
+    margin: 0 0 8px 0;
+    background: #eff6ff;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.teacher-mobile-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+/* Details Grid */
+.teacher-mobile-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.teacher-mobile-detail-item {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.teacher-mobile-detail-icon {
+    width: 32px;
+    height: 32px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+}
+
+.teacher-mobile-detail-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-mobile-detail-text span:first-child {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.teacher-mobile-detail-text span:last-child {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+}
+
+/* Section */
+.teacher-mobile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.teacher-mobile-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.teacher-mobile-contact-list {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.teacher-mobile-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+}
+
+.teacher-mobile-bio {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+    margin: 0;
+}
+
+.teacher-mobile-button {
+    margin-top: 8px;
+    background: #2563eb;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}

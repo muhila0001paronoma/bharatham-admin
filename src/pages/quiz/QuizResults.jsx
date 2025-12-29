@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import './QuizResults.css';
+import { Search, Filter, Plus, Edit, Trash2 } from 'lucide-react';
+import DataTable from '../../components/ui/DataTable';
 import { getQuizResults } from '../../data/data.js';
+import './QuizResults.css';
+import '../../components/ui/DataTable.css';
 
 const QuizResults = () => {
   const [rows, setRows] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const loadQuizResults = async () => {
@@ -12,77 +17,139 @@ const QuizResults = () => {
     };
     loadQuizResults();
   }, []);
+
+  const handleEdit = (row) => {
+    console.log('Edit row:', row);
+  };
+
+  const handleDelete = (row) => {
+    console.log('Delete row:', row);
+  };
+
+  const filteredData = rows.filter(item => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      item.topic.toLowerCase().includes(query) ||
+      item.email.toLowerCase().includes(query) ||
+      item.type.toLowerCase().includes(query)
+    );
+  });
+
+  const columns = [
+    {
+      key: 'id',
+      label: '#',
+      sortable: true,
+      width: '60px',
+      render: (value, row, index) => value
+    },
+    {
+      key: 'topic',
+      label: 'TOPIC',
+      sortable: true,
+    },
+    {
+      key: 'type',
+      label: 'TYPE',
+      sortable: true,
+    },
+    {
+      key: 'email',
+      label: 'USER EMAIL',
+      sortable: true,
+    },
+    {
+      key: 'total',
+      label: 'TOTAL QUESTIONS',
+      sortable: true,
+      render: (value) => <div style={{ textAlign: 'center' }}>{value}</div>
+    },
+    {
+      key: 'correct',
+      label: 'CORRECT ANSWERS',
+      sortable: true,
+      render: (value) => <div style={{ textAlign: 'center' }}>{value}</div>
+    },
+    {
+      key: 'result',
+      label: 'RESULT',
+      sortable: true,
+      render: (value) => <div style={{ textAlign: 'center' }}>{value}</div>
+    },
+    {
+      key: 'grade',
+      label: 'GRADE',
+      sortable: true,
+      render: (value) => <div style={{ textAlign: 'center' }}>{value}</div>
+    },
+    {
+      key: 'attempt',
+      label: 'ATTEMPT NO',
+      sortable: true,
+      render: (value) => <div style={{ textAlign: 'center' }}>{value}</div>
+    },
+    {
+      key: 'date',
+      label: 'DATE TIME',
+      sortable: true,
+    },
+    {
+      key: 'active',
+      label: 'ACTIVE',
+      sortable: true,
+      render: (value) => (
+        <span className={`status-pill ${value ? 'active' : ''}`}>
+          {value ? 'Active' : 'Inactive'}
+        </span>
+      )
+    }
+  ];
+
   return (
     <div className="quiz-results-page">
       <div className="quiz-results-header">
-        <h2>Quiz Results</h2>
+        <h2 className="quiz-results-title">Quiz Results</h2>
       </div>
 
-      <div className="quiz-results-card">
-        <div className="quiz-results-card-header">
-          <div className="card-title">Quiz Results</div>
-          <div className="card-actions">
-            <button className="outline-btn">
-              <span className="icon">☰</span>
-            </button>
-            <div className="search-box">
-              <span className="icon">🔍</span>
-              <input placeholder="Search..." />
-            </div>
-            <button className="primary-btn">Add Workout Video</button>
-          </div>
-        </div>
+      <div className="quiz-results-container">
+        <div className="quiz-results-card">
+          <div className="quiz-results-card-header">
+            <h3 className="card-title">Quiz Results</h3>
 
-        <div className="quiz-results-table">
-          <div className="table-head">
-            <span>#</span>
-            <span>#</span>
-            <span>TOPIC</span>
-            <span>TYPE</span>
-            <span>USER EMAIL</span>
-            <span>TOTAL QUESTIONS</span>
-            <span>CORRECT ANSWERS</span>
-            <span>RESULT</span>
-            <span>GRADE</span>
-            <span>ATTEMPT NO</span>
-            <span>DATE TIME</span>
-            <span>ACTIVE</span>
-            <span>ACTIONS</span>
+            <div className="quiz-results-toolbar">
+              <button className="filter-btn" title="Filter">
+                <Filter size={18} />
+              </button>
+
+              <div className="search-wrapper">
+                <Search size={18} className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+
+              <button className="add-btn">
+                <Plus size={18} />
+                <span>Add Workout Video</span>
+              </button>
+            </div>
           </div>
 
-          {rows.map((row) => (
-            <div key={row.id} className="table-row">
-              <span className="checkbox">
-                <input type="checkbox" />
-              </span>
-              <span>{row.id}</span>
-              <span>{row.topic}</span>
-              <span>{row.type}</span>
-              <span>{row.email}</span>
-              <span>{row.total}</span>
-              <span>{row.correct}</span>
-              <span>{row.result}</span>
-              <span>{row.grade}</span>
-              <span>{row.attempt}</span>
-              <span>{row.date}</span>
-              <span>
-                <span className={`status-pill ${row.active ? 'active' : ''}`}>
-                  {row.active ? 'Active' : 'Inactive'}
-                </span>
-              </span>
-              <span className="actions">
-                <button className="action-btn edit" aria-label="edit">✎</button>
-                <button className="action-btn delete" aria-label="delete">🗑</button>
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="quiz-results-footer">
-          <span>1-10 of 97</span>
-          <div className="pagination">
-            <button className="outline-btn">◀</button>
-            <button className="outline-btn">▶</button>
+          <div className="quiz-results-table-wrapper">
+            <DataTable
+              columns={columns}
+              data={filteredData}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              selectable={true}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
           </div>
         </div>
       </div>
@@ -91,4 +158,3 @@ const QuizResults = () => {
 };
 
 export default QuizResults;
-

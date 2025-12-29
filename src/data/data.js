@@ -198,7 +198,110 @@ export const usersData = {
 export const coursesData = {
 };
 
-export const teachersData = {
+export const teachersData = [
+  {
+    id: 1,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 2,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 3,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 4,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 5,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 6,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 7,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 8,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  },
+  {
+    id: 9,
+    image: null,
+    name: 'Sita Raman',
+    experience: '6 years',
+    email: 'sita.raman@gmail.com',
+    phone: '+919876543210',
+    specialization: 'Lasya and Mudras',
+    position: 'Lead Instructor',
+    active: true
+  }
+];
+
+export const getTeachersDetails = async () => {
+  return teachersData;
 };
 
 export const quizData = {

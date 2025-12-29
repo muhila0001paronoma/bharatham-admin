@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './QuizPage.css';
 import { getTheoryQuizSubTopics, getTheoryQuizQuestions } from '../../data/data.js';
 import QuizMobilePreview from '../../components/quiz/QuizMobilePreview';
+import {
+  Search,
+  RotateCw,
+  SquareArrowOutUpRight,
+  Plus,
+  Edit,
+  Trash2,
+  Check,
+  ExternalLink
+} from 'lucide-react';
+import './../../components/ui/DataTable.css';
 
 const TheoryQuiz = () => {
   const [subTopics, setSubTopics] = useState([]);
@@ -158,40 +169,28 @@ const TheoryQuiz = () => {
       <div className="quiz-top">
         <h2 className="quiz-title">Theory Quiz</h2>
         <div className="quiz-meta-actions">
-          <div className="quiz-total">Total Questions - 05</div>
-          <div className="quiz-actions">
-            <button className="quiz-btn primary" onClick={() => openModal('add')}>Add New Quiz</button>
-            <button
-              className="quiz-btn secondary"
-              onClick={() =>
-                openModal('edit', {
-                  title: 'Theory Quiz - Anjali',
-                  totalQuestions: 5,
-                  type: 'Theory',
-                  notes: 'Edit quiz details and questions here.'
-                })
-              }
-            >
-              Edit Quiz
-            </button>
-          </div>
+          {/* User profile could be here if not in sidebar */}
         </div>
       </div>
 
       <div className="quiz-content">
-        <aside className="quiz-left">
-          <div className="quiz-left-header">
-            <h3>Sub Topics</h3>
-            <button className="quiz-icon-btn" aria-label="refresh">⟲</button>
+        {/* Left Sidebar - Sub Topics */}
+        <aside className="quiz-sidebar">
+          <div className="quiz-sidebar-header">
+            <div className="quiz-sidebar-title-row">
+              <h3>Sub Topics</h3>
+              <ExternalLink size={18} className="quiz-header-icon" />
+            </div>
+            <div className="quiz-search-wrapper">
+              <Search size={16} className="quiz-search-icon" />
+              <input
+                placeholder="Search Sub Topic..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="quiz-search">
-            <span className="quiz-search-icon">🔍</span>
-            <input 
-              placeholder="Search Sub Topic..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+
           <div className="quiz-subtopic-list">
             {filteredSubTopics.map((name) => (
               <button
@@ -205,52 +204,71 @@ const TheoryQuiz = () => {
           </div>
         </aside>
 
-        <section className="quiz-right">
+        {/* Right Content - Questions */}
+        <section className="quiz-main-area">
+          <div className="quiz-main-header">
+            <span className="quiz-total-count">Total Questions - {questions.length.toString().padStart(2, '0')}</span>
+            <button className="quiz-btn primary" onClick={() => openModal('add')}>
+              <Plus size={18} style={{ marginRight: '6px' }} />
+              Add New Quiz
+            </button>
+          </div>
 
-          {questions.map((q, qIdx) => (
-            <div key={q.id} className="quiz-card">
-              <div className="quiz-card-header">
-                <div className="quiz-chip">{q.id}</div>
-                <h4>{q.question}</h4>
-                <button 
-                  className="quiz-btn ghost" 
-                  onClick={() => handleAddAnswer(q)}
-                >
-                  Add Answer
-                </button>
-              </div>
+          <div className="quiz-questions-list">
+            {questions.map((q, qIdx) => (
+              <div key={q.id} className="quiz-card">
+                <div className="quiz-card-header">
+                  <div className="quiz-chip">Q{qIdx + 1}</div>
+                  <h4 className="quiz-question-text">{q.question}</h4>
+                  <button
+                    className="quiz-btn add-answer-btn"
+                    onClick={() => handleAddAnswer(q)}
+                  >
+                    <Plus size={14} />
+                    Add Answer
+                  </button>
+                </div>
 
-              <div className="quiz-answers">
-                {q.answers.map((ans, ansIdx) => (
-                  <div key={ansIdx} className="quiz-answer">
-                    <span>{ans.text}</span>
-                    <div className="quiz-answer-actions">
-                      {ans.correct && <span className="quiz-pill">Correct Answer</span>}
-                      <button 
-                        className="quiz-icon-link" 
-                        aria-label="edit"
-                        onClick={() => handleEditAnswer(q, ans, ansIdx)}
-                      >
-                        ✎
-                      </button>
-                      <button 
-                        className="quiz-icon-link danger" 
-                        aria-label="delete"
-                        onClick={() => handleDeleteAnswer(q, ansIdx)}
-                      >
-                        🗑
-                      </button>
+                <div className="quiz-answers">
+                  {q.answers.map((ans, ansIdx) => (
+                    <div key={ansIdx} className="quiz-answer">
+                      <span className="quiz-answer-text">{ans.text}</span>
+                      <div className="quiz-answer-actions">
+                        {ans.correct && (
+                          <span className="quiz-pill success">
+                            Correct Answer
+                          </span>
+                        )}
+                        <button
+                          className="data-table-action-button data-table-action-edit"
+                          aria-label="edit"
+                          onClick={() => handleEditAnswer(q, ans, ansIdx)}
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          className="data-table-action-button data-table-action-delete"
+                          aria-label="delete"
+                          onClick={() => handleDeleteAnswer(q, ansIdx)}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              <div className="quiz-note">
-                {q.note}
-                <button className="quiz-icon-link" aria-label="edit note">✎</button>
+                {q.note && (
+                  <div className="quiz-note-wrapper">
+                    <p className="quiz-note-text">{q.note}</p>
+                    <button className="data-table-action-button data-table-action-edit note-edit" aria-label="edit note">
+                      <Edit size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
       </div>
 
@@ -394,4 +412,3 @@ const TheoryQuiz = () => {
 };
 
 export default TheoryQuiz;
-
