@@ -104,3 +104,4 @@ export default function TechniqueTopicModal({ isOpen, onClose, onSave, topicData
   );
 }
 
+

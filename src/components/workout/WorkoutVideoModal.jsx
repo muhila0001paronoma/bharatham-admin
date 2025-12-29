@@ -162,3 +162,4 @@ export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData =
   );
 }
 
+
