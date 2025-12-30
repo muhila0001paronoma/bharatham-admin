@@ -1,17 +1,14 @@
-/* Challenges Page Styles */
+/* Reels Page Styles */
 
-.challenge-page {
+.reels-page {
   display: flex;
   flex-direction: column;
   gap: 2rem;
   min-height: calc(100vh - 200px);
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
 }
 
 /* Page Header */
-.challenge-page-header {
+.reels-page-header {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 12px;
   padding: 2rem;
@@ -20,7 +17,7 @@
   overflow: hidden;
 }
 
-.challenge-page-header::before {
+.reels-page-header::before {
   content: '';
   position: absolute;
   top: 0;
@@ -31,7 +28,7 @@
   pointer-events: none;
 }
 
-.challenge-page-header-content {
+.reels-page-header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,13 +37,13 @@
   z-index: 1;
 }
 
-.challenge-page-header-left {
+.reels-page-header-left {
   display: flex;
   align-items: center;
   gap: 1.25rem;
 }
 
-.challenge-page-header-icon {
+.reels-page-header-icon {
   width: 64px;
   height: 64px;
   background: rgba(255, 255, 255, 0.2);
@@ -59,7 +56,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.challenge-page-header-title {
+.reels-page-header-title {
   font-size: 1.875rem;
   font-weight: 700;
   color: #ffffff;
@@ -68,19 +65,19 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.challenge-page-header-subtitle {
+.reels-page-header-subtitle {
   font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   opacity: 0.95;
 }
 
-.challenge-page-header-stats {
+.reels-page-header-stats {
   display: flex;
   gap: 1rem;
 }
 
-.challenge-page-stat-card {
+.reels-page-stat-card {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -93,13 +90,13 @@
   transition: all 0.3s ease;
 }
 
-.challenge-page-stat-card:hover {
+.reels-page-stat-card:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.challenge-page-stat-icon {
+.reels-page-stat-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -109,29 +106,34 @@
   color: #ffffff;
 }
 
-.challenge-page-stat-icon-primary {
+.reels-page-stat-icon-primary {
   background: rgba(59, 130, 246, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.challenge-page-stat-icon-info {
+.reels-page-stat-icon-success {
+  background: rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.reels-page-stat-icon-info {
   background: rgba(139, 92, 246, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.challenge-page-stat-content {
+.reels-page-stat-content {
   display: flex;
   flex-direction: column;
 }
 
-.challenge-page-stat-value {
+.reels-page-stat-value {
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
 }
 
-.challenge-page-stat-label {
+.reels-page-stat-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
@@ -139,39 +141,38 @@
   font-weight: 500;
 }
 
-.challenge-section {
+.reels-section {
   background: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.challenge-section-header {
+.reels-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.challenge-section-title {
+.reels-section-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
 }
 
-/* Challenge Details Section */
-.challenge-details-toolbar {
+.reels-details-toolbar {
   margin-bottom: 1rem;
 }
 
-.challenge-search-filter {
+.reels-search-filter {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.challenge-filter-button {
+.reels-filter-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -185,24 +186,24 @@
   color: #6b7280;
 }
 
-.challenge-filter-button:hover {
+.reels-filter-button:hover {
   background: #f9fafb;
   border-color: #9ca3af;
   color: #374151;
 }
 
-.challenge-filter-icon {
+.reels-filter-icon {
   width: 18px;
   height: 18px;
 }
 
-.challenge-search-input-wrapper {
+.reels-search-input-wrapper {
   position: relative;
   flex: 1;
   max-width: 400px;
 }
 
-.challenge-search-icon {
+.reels-search-icon {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -213,7 +214,7 @@
   pointer-events: none;
 }
 
-.challenge-search-input {
+.reels-search-input {
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 2.75rem;
   border: 1px solid #d1d5db;
@@ -223,18 +224,18 @@
   transition: all 0.2s;
 }
 
-.challenge-search-input:focus {
+.reels-search-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.challenge-search-input::placeholder {
+.reels-search-input::placeholder {
   color: #9ca3af;
 }
 
 /* Buttons */
-.challenge-button {
+.reels-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -247,27 +248,27 @@
   transition: all 0.2s;
 }
 
-.challenge-button-primary {
+.reels-button-primary {
   background: #3b82f6;
   color: #ffffff;
 }
 
-.challenge-button-primary:hover {
+.reels-button-primary:hover {
   background: #2563eb;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.challenge-button-icon {
+.reels-button-icon {
   width: 16px;
   height: 16px;
 }
 
 /* Table Container */
-.challenge-table-container {
+.reels-table-container {
   margin-top: 1rem;
 }
 
-.challenge-table-explanation {
+.reels-table-url {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -276,7 +277,56 @@
   font-size: 0.875rem;
 }
 
-.challenge-status {
+.reels-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reels-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reels-action-view-comments {
+  background: transparent;
+  color: #3b82f6;
+  padding: 0.25rem 0.5rem;
+}
+
+.reels-action-view-comments:hover {
+  background: #eff6ff;
+}
+
+.reels-action-edit {
+  background: transparent;
+  color: #3b82f6;
+  padding: 0.25rem;
+}
+
+.reels-action-edit:hover {
+  background: #eff6ff;
+}
+
+.reels-action-delete {
+  background: transparent;
+  color: #ef4444;
+  padding: 0.25rem;
+}
+
+.reels-action-delete:hover {
+  background: #fef2f2;
+}
+
+.reels-status {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -285,82 +335,81 @@
   text-transform: capitalize;
 }
 
-.challenge-status-active {
+.reels-status-active {
   background: #d1fae5;
   color: #065f46;
 }
 
-.challenge-status-inactive {
+.reels-status-inactive {
   background: #fee2e2;
   color: #991b1b;
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .challenge-page-header-content {
+  .reels-page-header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 1.5rem;
   }
 
-  .challenge-page-header-stats {
+  .reels-page-header-stats {
     width: 100%;
     justify-content: space-between;
   }
 
-  .challenge-page-stat-card {
+  .reels-page-stat-card {
     flex: 1;
     min-width: auto;
   }
 }
 
 @media (max-width: 768px) {
-  .challenge-page-header {
+  .reels-page-header {
     padding: 1.5rem;
   }
 
-  .challenge-page-header-left {
+  .reels-page-header-left {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  .challenge-page-header-icon {
+  .reels-page-header-icon {
     width: 56px;
     height: 56px;
   }
 
-  .challenge-page-header-title {
+  .reels-page-header-title {
     font-size: 1.5rem;
   }
 
-  .challenge-page-header-stats {
+  .reels-page-header-stats {
     flex-direction: column;
     width: 100%;
   }
 
-  .challenge-page-stat-card {
+  .reels-page-stat-card {
     width: 100%;
   }
 
-  .challenge-section {
+  .reels-section {
     padding: 1rem;
   }
 
-  .challenge-section-header {
+  .reels-section-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  .challenge-button {
+  .reels-button {
     width: 100%;
     justify-content: center;
   }
 
-  .challenge-search-input-wrapper {
+  .reels-search-input-wrapper {
     max-width: 100%;
   }
 }
-
 

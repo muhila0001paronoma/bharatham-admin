@@ -1,6 +1,7 @@
 import anjaliImage from '../assets/anjali.png';
 import gameAnjaliImage from '../assets/anjali.png';
 import onlineEventImage from '../assets/online-event.png';
+import sampleReelVideo from '../assets/sample_reel.mp4';
 
 export const getTheoryTopics = async () => {
   return theoryData.topics;
@@ -837,10 +838,104 @@ export const onlineEventsData = {
   ]
 };
 
-export const chatsData = {
-};
-
 export const reelsData = {
+  reels: [
+    {
+      id: 1,
+      videoUrl: sampleReelVideo,
+      title: 'Aramandi Basics Reel',
+      uploadedBy: 'bavi003@gmail.com',
+      uploadedAt: '2025-12-04 00:00:00',
+      likes: 10,
+      shares: 100,
+      active: true
+    },
+    {
+      id: 2,
+      videoUrl: sampleReelVideo,
+      title: 'Aramandi Basics Reel',
+      uploadedBy: 'bavi003@gmail.com',
+      uploadedAt: '2025-12-04 00:00:00',
+      likes: 10,
+      shares: 100,
+      active: true
+    },
+    {
+      id: 3,
+      videoUrl: sampleReelVideo,
+      title: 'Aramandi Basics Reel',
+      uploadedBy: 'bavi003@gmail.com',
+      uploadedAt: '2025-12-04 00:00:00',
+      likes: 10,
+      shares: 100,
+      active: true
+    },
+    {
+      id: 4,
+      videoUrl: sampleReelVideo,
+      title: 'Aramandi Basics Reel',
+      uploadedBy: 'bavi003@gmail.com',
+      uploadedAt: '2025-12-04 00:00:00',
+      likes: 10,
+      shares: 100,
+      active: true
+    },
+    {
+      id: 5,
+      videoUrl: sampleReelVideo,
+      title: 'Aramandi Basics Reel',
+      uploadedBy: 'bavi003@gmail.com',
+      uploadedAt: '2025-12-04 00:00:00',
+      likes: 10,
+      shares: 100,
+      active: true
+    }
+  ],
+  comments: {
+    1: [
+      {
+        id: 1,
+        userId: 'user1',
+        userName: 'Priya Sharma',
+        userEmail: 'priya@example.com',
+        comment: 'Amazing technique! This really helped me understand the basics.',
+        commentedAt: '2025-12-04 10:30:00',
+        likes: 5
+      },
+      {
+        id: 2,
+        userId: 'user2',
+        userName: 'Raj Kumar',
+        userEmail: 'raj@example.com',
+        comment: 'Great explanation. Can you make more videos like this?',
+        commentedAt: '2025-12-04 11:15:00',
+        likes: 3
+      },
+      {
+        id: 3,
+        userId: 'user3',
+        userName: 'Anjali Patel',
+        userEmail: 'anjali@example.com',
+        comment: 'Thank you for sharing this! Very helpful for beginners.',
+        commentedAt: '2025-12-04 12:00:00',
+        likes: 8
+      }
+    ],
+    2: [
+      {
+        id: 4,
+        userId: 'user4',
+        userName: 'Suresh',
+        userEmail: 'suresh@example.com',
+        comment: 'Excellent demonstration of the technique.',
+        commentedAt: '2025-12-04 13:20:00',
+        likes: 2
+      }
+    ],
+    3: [],
+    4: [],
+    5: []
+  }
 };
 
 export const classScheduleData = {
@@ -971,5 +1066,100 @@ export const gamesData = {
       active: true
     }
   ]
+};
+
+export const chatsData = {
+  conversations: [
+    {
+      id: 1,
+      name: 'Bharathnatyam Basics',
+      lastMessage: 'Welcome to the Course',
+      timestamp: '16:45',
+      unreadCount: 0,
+      isRead: true,
+      avatar: null,
+      isOnline: false
+    },
+    {
+      id: 2,
+      name: 'Ram',
+      lastMessage: 'you: Hello Sir, I\'ve ...',
+      timestamp: '16:45',
+      unreadCount: 0,
+      isRead: true,
+      avatar: null,
+      isOnline: true
+    },
+    {
+      id: 3,
+      name: 'Advanced Mudras',
+      lastMessage: 'you: Tomorrow, We have ...',
+      timestamp: '16:45',
+      unreadCount: 0,
+      isRead: true,
+      avatar: null,
+      isOnline: false
+    },
+    {
+      id: 4,
+      name: 'Bavi',
+      lastMessage: 'Awesome!',
+      timestamp: '16:45',
+      unreadCount: 2,
+      isRead: false,
+      avatar: null,
+      isOnline: true
+    }
+  ],
+  messages: {
+    1: [
+      {
+        id: 1,
+        senderId: 'other',
+        senderName: 'Bharathnatyam Basics',
+        text: 'Welcome to the Course',
+        timestamp: '16:45',
+        isRead: true
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        senderId: 'other',
+        senderName: 'Ram',
+        text: 'Hello Admin, I\'ve uploaded a new Adavu - Tatta Metta lesson video. Can you please review and approve it?',
+        timestamp: '15:42',
+        isRead: true
+      },
+      {
+        id: 2,
+        senderId: 'admin',
+        senderName: 'Admin User',
+        text: 'Hello Sir, I\'ve checked the video. The quality and explanation are clear. I\'ll approve it now and publish it under Beginner Level.',
+        timestamp: '15:42',
+        isRead: true
+      }
+    ],
+    3: [
+      {
+        id: 1,
+        senderId: 'other',
+        senderName: 'Advanced Mudras',
+        text: 'Tomorrow, We have ...',
+        timestamp: '16:45',
+        isRead: true
+      }
+    ],
+    4: [
+      {
+        id: 1,
+        senderId: 'other',
+        senderName: 'Bavi',
+        text: 'Awesome!',
+        timestamp: '16:45',
+        isRead: false
+      }
+    ]
+  }
 };
 
