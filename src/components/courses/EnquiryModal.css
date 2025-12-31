@@ -1,0 +1,260 @@
+.enquiry-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: enquiryFadeIn 0.2s ease-out;
+}
+
+.enquiry-modal-content {
+    background: #ffffff;
+    width: 95%;
+    max-width: 900px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: enquirySlideUp 0.3s ease-out;
+}
+
+@keyframes enquiryFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes enquirySlideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.enquiry-modal-header {
+    padding: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+}
+
+.enquiry-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.enquiry-modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.enquiry-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.enquiry-modal-body-container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.enquiry-modal-form-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.enquiry-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.enquiry-modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.enquiry-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.enquiry-modal-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.enquiry-modal-field input,
+.enquiry-modal-field select,
+.enquiry-modal-field textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.enquiry-modal-field input:focus,
+.enquiry-modal-field select:focus,
+.enquiry-modal-field textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.enquiry-input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.enquiry-input-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+}
+
+.enquiry-input-with-icon input {
+    padding-left: 2.5rem;
+}
+
+.textarea-icon-wrapper {
+    align-items: flex-start;
+}
+
+.area-icon {
+    top: 12px;
+}
+
+.enquiry-input-with-icon textarea {
+    padding-left: 2.5rem;
+}
+
+.enquiry-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.enquiry-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.enquiry-modal-preview-section {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    min-height: 480px;
+}
+
+.enquiry-preview-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.enquiry-preview-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.enquiry-modal-footer {
+    padding: 1.5rem;
+    border-top: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    background: #ffffff;
+}
+
+.enquiry-modal-btn {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.enquiry-modal-btn.cancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.enquiry-modal-btn.cancel:hover {
+    background: #e2e8f0;
+}
+
+.enquiry-modal-btn.save {
+    background: #2563eb;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.enquiry-modal-btn.save:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+    .enquiry-modal-body-container {
+        grid-template-columns: 1fr;
+    }
+
+    .enquiry-modal-preview-section {
+        display: none;
+    }
+}

@@ -10,7 +10,10 @@ import {
   Edit,
   Trash2,
   Check,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 import './../../components/ui/DataTable.css';
 
@@ -164,12 +167,42 @@ const TheoryQuiz = () => {
     }));
   };
 
+  const totalQuizzes = questions.length;
+  const totalSubTopics = subTopics.length;
+
   return (
     <div className="quiz-page">
-      <div className="quiz-top">
-        <h2 className="quiz-title">Theory Quiz</h2>
-        <div className="quiz-meta-actions">
-          {/* User profile could be here if not in sidebar */}
+      <div className="theory-page-header">
+        <div className="theory-page-header-content">
+          <div className="theory-page-header-left">
+            <div className="theory-page-header-icon">
+              <HelpCircle size={28} />
+            </div>
+            <div>
+              <h1 className="theory-page-header-title">Theory Quiz</h1>
+              <p className="theory-page-header-subtitle">Manage questions, answers, and sub-topics for theory quizzes</p>
+            </div>
+          </div>
+          <div className="theory-page-header-stats">
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-primary">
+                <BookOpen size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{totalSubTopics}</div>
+                <div className="theory-page-stat-label">Sub Topics</div>
+              </div>
+            </div>
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-success">
+                <FileText size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{totalQuizzes}</div>
+                <div className="theory-page-stat-label">Total Questions</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
