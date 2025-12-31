@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Edit, Trash2, Plus } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, Plus, Video, Film, CheckCircle } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import ChoreographyVideoModal from '../../components/teachers/ChoreographyVideoModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
@@ -183,7 +183,7 @@ const ChoreographyVideos = () => {
       label: 'ACTIVE',
       sortable: true,
       render: (value) => (
-        <span className={`status-pill ${value ? 'active' : ''}`}>
+        <span className={`theory-status ${value ? 'theory-status-active' : 'theory-status-inactive'}`}>
           {value ? 'Active' : 'Inactive'}
         </span>
       )
@@ -204,47 +204,79 @@ const ChoreographyVideos = () => {
     }
   ];
 
+  const totalVideos = rows.length;
+  const activeVideos = rows.filter(r => r.active).length;
+
   return (
     <div className="choreography-page">
-      <div className="choreography-container">
-        <div className="choreography-card">
-          <div className="choreography-card-header">
-            <h3 className="choreography-title">Choreography Videos</h3>
-
-            <div className="choreography-toolbar">
-              <div className="choreography-search-filter">
-                <button className="filter-btn" title="Filter">
-                  <Filter size={18} />
-                </button>
-
-                <div className="search-input-wrapper">
-                  <Search size={18} className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
-                  />
-                </div>
-
-                <button className="add-btn" onClick={handleAddVideo}>
-                  <Plus size={18} />
-                  <span>Add Video</span>
-                </button>
+      <div className="theory-page-header">
+        <div className="theory-page-header-content">
+          <div className="theory-page-header-left">
+            <div className="theory-page-header-icon">
+              <Video size={28} />
+            </div>
+            <div>
+              <h1 className="theory-page-header-title">Choreography Management</h1>
+              <p className="theory-page-header-subtitle">Manage and showcase dance choreography videos</p>
+            </div>
+          </div>
+          <div className="theory-page-header-stats">
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-primary">
+                <Film size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{totalVideos}</div>
+                <div className="theory-page-stat-label">Total Videos</div>
+              </div>
+            </div>
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-success">
+                <CheckCircle size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{activeVideos}</div>
+                <div className="theory-page-stat-label">Active</div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="theory-section">
+        <div className="theory-section-header">
+          <h2 className="theory-section-title">Choreography Videos</h2>
+          <button className="theory-button theory-button-primary" onClick={handleAddVideo}>
+            <Plus className="theory-button-icon" />
+            <span>Add Video</span>
+          </button>
+        </div>
 
-          <div className="choreography-table-wrapper">
-            <DataTable
-              columns={columns}
-              data={filteredData}
-              selectable={true}
-              pageSize={pageSize}
-              onPageSizeChange={setPageSize}
-            />
+        <div className="theory-details-toolbar">
+          <div className="theory-search-filter">
+            <button className="theory-filter-button" title="Filter">
+              <Filter className="theory-filter-icon" />
+            </button>
+            <div className="theory-search-input-wrapper">
+              <Search className="theory-search-icon" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="theory-search-input"
+              />
+            </div>
           </div>
+        </div>
+
+        <div className="theory-table-container">
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            selectable={true}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
 

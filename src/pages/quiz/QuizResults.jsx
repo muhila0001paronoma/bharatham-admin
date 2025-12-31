@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Edit, Trash2 } from 'lucide-react';
+import { Search, Filter, Plus, Edit, Trash2, Award, Users, CheckCircle } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import { getQuizResults } from '../../data/data.js';
 import './QuizResults.css';
@@ -99,58 +99,89 @@ const QuizResults = () => {
       label: 'ACTIVE',
       sortable: true,
       render: (value) => (
-        <span className={`status-pill ${value ? 'active' : ''}`}>
+        <span className={`theory-status ${value ? 'theory-status-active' : 'theory-status-inactive'}`}>
           {value ? 'Active' : 'Inactive'}
         </span>
       )
     }
   ];
 
+  const totalSubmissions = rows.length;
+  const passedStudents = rows.filter(r => r.grade !== 'F').length;
+
   return (
     <div className="quiz-results-page">
-      <div className="quiz-results-header">
-        <h2 className="quiz-results-title">Quiz Results</h2>
-      </div>
-
-      <div className="quiz-results-container">
-        <div className="quiz-results-card">
-          <div className="quiz-results-card-header">
-            <h3 className="card-title">Quiz Results</h3>
-
-            <div className="quiz-results-toolbar">
-              <button className="filter-btn" title="Filter">
-                <Filter size={18} />
-              </button>
-
-              <div className="search-wrapper">
-                <Search size={18} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
-              </div>
-
-              <button className="add-btn">
-                <Plus size={18} />
-                <span>Add Workout Video</span>
-              </button>
+      <div className="theory-page-header">
+        <div className="theory-page-header-content">
+          <div className="theory-page-header-left">
+            <div className="theory-page-header-icon">
+              <Award size={28} />
+            </div>
+            <div>
+              <h1 className="theory-page-header-title">Quiz Results</h1>
+              <p className="theory-page-header-subtitle">View and analyze student performance across all quizzes</p>
             </div>
           </div>
-
-          <div className="quiz-results-table-wrapper">
-            <DataTable
-              columns={columns}
-              data={filteredData}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              selectable={true}
-              pageSize={pageSize}
-              onPageSizeChange={setPageSize}
-            />
+          <div className="theory-page-header-stats">
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-primary">
+                <Users size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{totalSubmissions}</div>
+                <div className="theory-page-stat-label">Submissions</div>
+              </div>
+            </div>
+            <div className="theory-page-stat-card">
+              <div className="theory-page-stat-icon theory-page-stat-icon-success">
+                <CheckCircle size={20} />
+              </div>
+              <div className="theory-page-stat-content">
+                <div className="theory-page-stat-value">{passedStudents}</div>
+                <div className="theory-page-stat-label">Passed</div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className="theory-section">
+        <div className="theory-section-header">
+          <h2 className="theory-section-title">Quiz Results</h2>
+          <button className="theory-button theory-button-primary">
+            <Plus className="theory-button-icon" />
+            <span>Add Quiz Result</span>
+          </button>
+        </div>
+
+        <div className="theory-details-toolbar">
+          <div className="theory-search-filter">
+            <button className="theory-filter-button" title="Filter">
+              <Filter className="theory-filter-icon" />
+            </button>
+            <div className="theory-search-input-wrapper">
+              <Search className="theory-search-icon" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="theory-search-input"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="theory-table-container">
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            selectable={true}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
     </div>

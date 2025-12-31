@@ -8,7 +8,7 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   body {
     margin: 0;
     padding: 0;
@@ -18,11 +18,340 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   #root {
     margin: 0;
     padding: 0;
     width: 100%;
     min-height: 100vh;
+  }
+}
+
+/* Global Page Header Styles (Matching Theory.jsx pattern) */
+.theory-page-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.theory-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
+  pointer-events: none;
+}
+
+.theory-page-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.theory-page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.theory-page-header-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theory-page-header-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theory-page-header-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  opacity: 0.95;
+}
+
+.theory-page-header-stats {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.theory-page-stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.theory-page-stat-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.theory-page-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.theory-page-stat-icon-primary {
+  background: rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theory-page-stat-icon-success {
+  background: rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theory-page-stat-icon-info {
+  background: rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theory-page-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.theory-page-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.theory-page-stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+  .theory-page-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .theory-page-header-stats {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .theory-page-stat-card {
+    flex-shrink: 0;
+  }
+}
+
+/* Global Section and Table patterns */
+.theory-section {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.theory-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.theory-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* Theory Details Section & Toolbar */
+.theory-details-toolbar {
+  margin-bottom: 1rem;
+}
+
+.theory-search-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theory-filter-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6b7280;
+}
+
+.theory-filter-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.theory-filter-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.theory-search-input-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.theory-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.theory-search-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #1f2937;
+  transition: all 0.2s;
+}
+
+.theory-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.theory-search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Buttons */
+.theory-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theory-button-primary {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.theory-button-primary:hover {
+  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.theory-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Table Container */
+.theory-table-container {
+  margin-top: 1rem;
+}
+
+/* Status Pills */
+.theory-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.theory-status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.theory-status-info {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.theory-status-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 768px) {
+  .theory-section {
+    padding: 1rem;
+  }
+
+  .theory-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .theory-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .theory-search-input-wrapper {
+    max-width: 100%;
   }
 }
