@@ -939,6 +939,53 @@ export const reelsData = {
 };
 
 export const classScheduleData = {
+  schedules: [
+    {
+      id: 1,
+      courseTitle: 'Beginner Bharatanatyam Basics',
+      date: '2026-03-16',
+      startTime: '18:00:00',
+      endTime: '19:30:00',
+      status: 'Upcoming',
+      active: true
+    },
+    {
+      id: 2,
+      courseTitle: 'Intermediate Adavus',
+      date: '2026-03-17',
+      startTime: '18:00:00',
+      endTime: '19:30:00',
+      status: 'Upcoming',
+      active: true
+    },
+    {
+      id: 3,
+      courseTitle: 'Advanced Mudras',
+      date: '2026-03-18',
+      startTime: '18:00:00',
+      endTime: '19:30:00',
+      status: 'Upcoming',
+      active: true
+    },
+    {
+      id: 4,
+      courseTitle: 'Beginner Bharatanatyam Basics',
+      date: '2026-03-19',
+      startTime: '18:00:00',
+      endTime: '20:30:00',
+      status: 'Upcoming',
+      active: true
+    },
+    {
+      id: 5,
+      courseTitle: 'Intermediate Adavus',
+      date: '2026-03-20',
+      startTime: '18:00:00',
+      endTime: '19:30:00',
+      status: 'Upcoming',
+      active: true
+    }
+  ]
 };
 
 export const gamesData = {
