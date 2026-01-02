@@ -1,0 +1,59 @@
+.view-user-preference-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 0.65rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 12px;
+    line-height: 1.1;
+    text-align: center;
+    font-family: inherit;
+    white-space: normal;
+}
+
+.view-user-preference-btn:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+.user-details-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.action-btn-edit {
+    color: #2563eb;
+    padding: 6px;
+    border-radius: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.action-btn-edit:hover {
+    background-color: #eff6ff;
+}
+
+.action-btn-delete {
+    color: #ef4444;
+    padding: 6px;
+    border-radius: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.action-btn-delete:hover {
+    background-color: #fef2f2;
+}
