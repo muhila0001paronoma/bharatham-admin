@@ -1,0 +1,182 @@
+/* Attendance Modal Styles */
+.attendance-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.attendance-modal-content {
+    background: #ffffff;
+    width: 95%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.attendance-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+}
+
+.attendance-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.attendance-modal-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.attendance-modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.attendance-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.attendance-modal-body {
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.attendance-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.attendance-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f8fafc;
+    transition: background-color 0.1s;
+}
+
+.attendance-item:hover {
+    background-color: #f8fafc;
+}
+
+.attendance-student-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.attendance-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.attendance-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.attendance-status {
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+.status-present {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-absent {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-late {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+.attendance-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.attendance-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

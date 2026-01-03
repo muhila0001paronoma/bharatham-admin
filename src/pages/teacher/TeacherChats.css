@@ -1,0 +1,17 @@
+/* Teacher Chats override if strictly needed to match screenshot on top of admin styles */
+.chats-page {
+    /* If Layout has padding, we need to negative margin to fill full space like Admin */
+    width: calc(100% + 4rem);
+    height: calc(100vh - 120px + 4rem);
+    margin: -2rem;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* Ensure title "Chats" is present at top if Layout doesn't provide it, 
+   but TeacherChats.jsx structure above doesn't include it inside .chats-page 
+   because Admin page doesn't have it. 
+   If user really wants "Chats" title at top like screenshot, it likely comes from Layout Header.
+*/

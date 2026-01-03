@@ -9,6 +9,10 @@
     background-color: transparent;
 }
 
+.choreography-page .theory-page-header-title {
+    color: #ffffff !important;
+}
+
 .url-cell {
     max-width: 150px;
     word-break: break-all;
