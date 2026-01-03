@@ -1,0 +1,39 @@
+.teacher-schedule-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    background-color: transparent;
+}
+
+.view-attendance-btn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.2;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.view-attendance-btn:hover {
+    background-color: #eff6ff;
+    text-decoration: underline;
+}
+
+/* Ensure title is black - though inline style should now work since we removed the conflicting class */
+.teacher-schedule-page .theory-page-header-title {
+    color: #000000 !important;
+}
+
+@media (max-width: 768px) {
+    .teacher-schedule-page {
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+}
