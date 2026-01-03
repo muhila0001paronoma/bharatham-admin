@@ -28,11 +28,21 @@ import ClassSchedule from './pages/ClassSchedule';
 import Users from './pages/Users';
 import UserDetails from './pages/users/UserDetails';
 import UserPreference from './pages/users/UserPreference';
+import TeacherDashboard from './pages/teacher/TeacherDashboard';
+import TeacherCourses from './pages/teacher/TeacherCourses';
+import TeacherChoreography from './pages/teacher/TeacherChoreography';
+import TeacherSchedule from './pages/teacher/TeacherSchedule';
+import TeacherChats from './pages/teacher/TeacherChats';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   return isAuthenticated ? children : <Navigate to="/" replace />;
+}
+
+function RoleBasedComponent({ adminComponent, teacherComponent }) {
+  const role = localStorage.getItem('role');
+  return role === 'teacher' ? teacherComponent : adminComponent;
 }
 
 function App() {
@@ -47,7 +57,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Dashboard />
+                <RoleBasedComponent
+                  adminComponent={<Dashboard />}
+                  teacherComponent={<TeacherDashboard />}
+                />
               </Layout>
             </ProtectedRoute>
           }
@@ -157,7 +170,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Chats />
+                <RoleBasedComponent
+                  adminComponent={<Chats />}
+                  teacherComponent={<TeacherChats />}
+                />
               </Layout>
             </ProtectedRoute>
           }
@@ -197,7 +213,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <ChoreographyVideos />
+                <RoleBasedComponent
+                  adminComponent={<ChoreographyVideos />}
+                  teacherComponent={<TeacherChoreography />}
+                />
               </Layout>
             </ProtectedRoute>
           }
@@ -207,7 +226,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Courses />
+                <RoleBasedComponent
+                  adminComponent={<Courses />}
+                  teacherComponent={<TeacherCourses />}
+                />
               </Layout>
             </ProtectedRoute>
           }
@@ -257,7 +279,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <ClassSchedule />
+                <RoleBasedComponent
+                  adminComponent={<ClassSchedule />}
+                  teacherComponent={<TeacherSchedule />}
+                />
               </Layout>
             </ProtectedRoute>
           }

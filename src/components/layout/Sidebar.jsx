@@ -92,7 +92,9 @@ export default function Sidebar() {
     });
   };
 
-  const menuItems = [
+  const role = localStorage.getItem('role') || 'admin';
+
+  const adminMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: iconMap.dashboard, path: '/dashboard' },
     { id: 'theory', label: 'Theory', icon: iconMap.theory, path: '/theory' },
     { id: 'techniques', label: 'Techniques', icon: iconMap.techniques, path: '/techniques' },
@@ -148,6 +150,16 @@ export default function Sidebar() {
     }
   ];
 
+  const teacherMenuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: iconMap.dashboard, path: '/dashboard' },
+    { id: 'courses', label: 'My Courses', icon: iconMap.courses, path: '/courses' },
+    { id: 'choreography-videos', label: 'Choreography Videos', icon: iconMap.reels, path: '/teachers/choreography' },
+    { id: 'class-schedule', label: 'Class Schedule', icon: iconMap['class-schedule'], path: '/class-schedule' },
+    { id: 'chats', label: 'Chats', icon: iconMap.chats, path: '/chats' }
+  ];
+
+  const menuItems = role === 'teacher' ? teacherMenuItems : adminMenuItems;
+
   const isActive = (path) => {
     if (path === '/dashboard') {
       return location.pathname === '/dashboard';
@@ -157,6 +169,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('role');
     navigate('/');
   };
 

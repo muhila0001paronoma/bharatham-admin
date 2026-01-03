@@ -2,6 +2,9 @@ import React from 'react';
 import './Header.css';
 
 export default function Header({ pageTitle = 'Dashboard' }) {
+  const role = localStorage.getItem('role');
+  const isTeacher = role === 'teacher';
+
   return (
     <div className="header">
       <div className="header-content">
@@ -10,19 +13,19 @@ export default function Header({ pageTitle = 'Dashboard' }) {
             {pageTitle}
           </h1>
           <p className="header-subtitle">
-            Bharatham Admin Panel
+            {isTeacher ? 'Bharatham Teacher Panel' : 'Bharatham Admin Panel'}
           </p>
         </div>
         <div className="header-user-section">
           <div className="header-avatar">
-            A
+            {isTeacher ? 'T' : 'A'}
           </div>
           <div className="header-user-info">
             <div className="header-user-name">
-              Admin User
+              {isTeacher ? 'Teacher User' : 'Admin User'}
             </div>
             <div className="header-user-role">
-              Administrator
+              {isTeacher ? 'Teacher' : 'Administrator'}
             </div>
           </div>
           <div className="header-notification">

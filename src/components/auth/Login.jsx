@@ -13,17 +13,24 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
-    // Set authentication status and redirect
-    localStorage.setItem('isAuthenticated', 'true');
-    navigate('/dashboard');
+
+    if (email === 'teacher@gmail.com') {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('role', 'teacher');
+      navigate('/dashboard');
+    } else if (email === 'admin@gmail.com') {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('role', 'admin');
+      navigate('/dashboard');
+    } else {
+      alert('Please use admin@gmail.com or teacher@gmail.com');
+    }
   };
 
   return (
     <div className="login-container">
-      {/* Left Section - Illustration */}
       <div className="login-illustration-section">
         <div className="login-illustration-container">
           <img
@@ -34,10 +41,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right Section - Login Form */}
       <div className="login-form-section">
         <div className="login-form-container">
-          {/* Header */}
           <div className="login-header">
             <h2 className="login-subtitle">
               Welcome to
@@ -47,9 +52,7 @@ export default function Login() {
             </h1>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="login-form">
-            {/* Email Input */}
             <div className="login-input-group">
               <label htmlFor="email" className="login-label">
                 Email
@@ -68,7 +71,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Password Input */}
             <div className="login-input-group">
               <label htmlFor="password" className="login-label">
                 Password
@@ -98,7 +100,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Remember Me and Forgot Password */}
             <div className="login-options">
               <div className="login-remember-me">
                 <input
@@ -119,7 +120,6 @@ export default function Login() {
               </button>
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}
