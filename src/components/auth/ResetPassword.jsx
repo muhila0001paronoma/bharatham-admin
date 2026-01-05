@@ -13,15 +13,15 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Get token from URL params (in real app, you'd extract this from the route)
+  // Get email from URL params
   const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
+  const email = urlParams.get('email');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!otp || otp.length !== 6) {
-      alert('Please enter a valid 6-digit OTP');
+    if (!otp || otp.length < 4) {
+      alert('Please enter a valid OTP');
       return;
     }
 
@@ -36,11 +36,56 @@ export default function ResetPassword() {
     }
 
     setIsLoading(true);
-    // Simulate API call - verify OTP and reset password
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setIsSubmitted(true);
-    console.log('Password reset completed with OTP:', otp, 'for token:', token);
+
+    try {
+      // Step 1: Verify OTP
+      const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          otpCode: otp
+        }),
+      });
+
+      const verifyResult = await verifyResponse.json();
+
+      if (!verifyResult.success) {
+        alert(verifyResult.message || 'OTP verification failed.');
+        setIsLoading(false);
+        return;
+      }
+
+      const { resetToken } = verifyResult.data;
+
+      // Step 2: Reset Password
+      const resetResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          resetToken,
+          newPassword: password
+        }),
+      });
+
+      const resetResult = await resetResponse.json();
+
+      if (resetResult.success) {
+        setIsSubmitted(true);
+      } else {
+        alert(resetResult.message || 'Password reset failed.');
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      alert('An error occurred. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,10 +129,10 @@ export default function ResetPassword() {
                       id="otp"
                       type="text"
                       value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                       className="reset-password-input reset-password-otp-input"
-                      placeholder="000000"
-                      maxLength={6}
+                      placeholder="0000"
+                      maxLength={4}
                       required
                     />
                   </div>

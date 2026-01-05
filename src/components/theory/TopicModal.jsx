@@ -4,7 +4,7 @@ import { Input } from '../ui/input';
 import TopicMobilePreview from './TopicMobilePreview';
 import './TheoryModal.css';
 
-export default function TopicModal({ isOpen, onClose, onSave, topicData = null, existingTopics = [] }) {
+export default function TopicModal({ isOpen, onClose, onSave, topicData = null, existingTopics = [], isLoading = false }) {
   const [formData, setFormData] = useState({
     topicName: '',
     active: true
@@ -86,8 +86,12 @@ export default function TopicModal({ isOpen, onClose, onSave, topicData = null, 
                 <button type="button" className="theory-form-cancel-btn" onClick={onClose}>
                   Cancel
                 </button>
-                <button type="submit" className="theory-form-submit-btn">
-                  {topicData ? 'Update' : 'Create'} Topic
+                <button
+                  type="submit"
+                  className="theory-form-submit-btn"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : (topicData ? 'Update Topic' : 'Create Topic')}
                 </button>
               </div>
             </form>
@@ -98,9 +102,9 @@ export default function TopicModal({ isOpen, onClose, onSave, topicData = null, 
             <div className="theory-preview-header">
               <h3 className="theory-preview-title">Mobile Preview</h3>
             </div>
-            <TopicMobilePreview 
-              formData={formData} 
-              existingTopics={existingTopics}
+            <TopicMobilePreview
+              formData={formData}
+              existingTopics={topicData ? existingTopics.filter(t => t.topicId !== topicData.topicId) : existingTopics}
             />
           </div>
         </div>

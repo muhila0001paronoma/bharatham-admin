@@ -170,6 +170,8 @@ export default function Sidebar() {
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('role');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/');
   };
 

@@ -12,16 +12,30 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call - send OTP to email
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
 
-    // Generate a mock token for demonstration
-    const mockToken = '123456';
-    console.log('OTP sent to:', email, 'Token:', mockToken);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    // Navigate to reset password page with token
-    navigate(`/reset-password?token=${mockToken}`);
+      const result = await response.json();
+
+      if (result.success) {
+        // Navigate to reset password page with email
+        navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+      } else {
+        alert(result.message || 'Error occurred. Please try again.');
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      alert('An error occurred. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,47 +67,47 @@ export default function ForgotPassword() {
           </div>
 
           {/* Forgot Password Form */}
-              <form onSubmit={handleSubmit} className="forgot-password-form">
-                {/* Email Input */}
-                <div className="forgot-password-input-group">
-                  <label htmlFor="email" className="forgot-password-label">
-                    Email Address
-                  </label>
-                  <div className="forgot-password-input-container">
-                    <Mail className="forgot-password-input-icon" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="forgot-password-input"
-                      placeholder="example@gmail.com"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="forgot-password-submit-button"
-                >
-                  {isLoading ? 'Sending...' : 'Send OTP Code'}
-                </button>
-              </form>
-
-              {/* Back to Login */}
-              <div className="forgot-password-back-section">
-                <button
-                  type="button"
-                  onClick={() => navigate('/login')}
-                  className="forgot-password-back-button"
-                >
-                  <ArrowLeft style={{ width: '1rem', height: '1rem' }} />
-                  Back to Login
-                </button>
+          <form onSubmit={handleSubmit} className="forgot-password-form">
+            {/* Email Input */}
+            <div className="forgot-password-input-group">
+              <label htmlFor="email" className="forgot-password-label">
+                Email Address
+              </label>
+              <div className="forgot-password-input-container">
+                <Mail className="forgot-password-input-icon" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="forgot-password-input"
+                  placeholder="example@gmail.com"
+                  required
+                />
               </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="forgot-password-submit-button"
+            >
+              {isLoading ? 'Sending...' : 'Send OTP Code'}
+            </button>
+          </form>
+
+          {/* Back to Login */}
+          <div className="forgot-password-back-section">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="forgot-password-back-button"
+            >
+              <ArrowLeft style={{ width: '1rem', height: '1rem' }} />
+              Back to Login
+            </button>
+          </div>
         </div>
       </div>
     </div>

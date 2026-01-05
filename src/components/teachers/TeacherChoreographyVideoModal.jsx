@@ -6,7 +6,7 @@ import './TeacherChoreographyVideoModal.css';
 const TeacherChoreographyVideoModal = ({ isOpen, onClose, onSave, videoData }) => {
     const [formData, setFormData] = useState({
         title: '',
-        teacherName: 'Teacher User', // Default to current teacher
+        teacherName: 'Teacher User',
         videoUrl: '',
         thumbnailUrl: '',
         description: '',

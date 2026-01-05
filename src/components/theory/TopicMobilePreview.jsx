@@ -3,9 +3,10 @@ import { ArrowLeft } from 'lucide-react';
 import './TopicMobilePreview.css';
 
 export default function TopicMobilePreview({ formData, existingTopics = [] }) {
-  const allTopics = formData.topicName 
-    ? [formData.topicName, ...existingTopics.filter(t => t !== formData.topicName)]
-    : existingTopics;
+  const allTopicsNames = existingTopics.map(t => typeof t === 'object' ? t.topicName : t);
+  const allTopics = formData.topicName
+    ? [formData.topicName, ...allTopicsNames.filter(t => t !== formData.topicName)]
+    : allTopicsNames;
 
   return (
     <div className="theory-mobile-preview-container">
@@ -42,8 +43,8 @@ export default function TopicMobilePreview({ formData, existingTopics = [] }) {
           <div className="theory-topic-preview-grid">
             {allTopics.length > 0 ? (
               allTopics.map((topic, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`theory-topic-preview-card ${topic === formData.topicName ? 'theory-topic-preview-card-new' : ''}`}
                 >
                   <div className="theory-topic-preview-card-content">
