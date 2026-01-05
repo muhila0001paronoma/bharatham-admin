@@ -195,7 +195,7 @@ const TeacherChoreography = () => {
     const activeVideos = rows.filter(r => r.active).length;
 
     return (
-        <div className="choreography-page">
+        <div className="layout-content choreography-page">
             <div className="theory-page-header">
                 <div className="theory-page-header-content">
                     <div className="theory-page-header-left">

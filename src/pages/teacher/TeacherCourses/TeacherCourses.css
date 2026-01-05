@@ -1,0 +1,202 @@
+.teacher-courses-container {
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+}
+
+.teacher-courses-header h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 2rem;
+}
+
+/* Toolbar */
+.courses-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.toolbar-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex: 1;
+}
+
+.filter-btn {
+    padding: 0.6rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 300px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.6rem 0.6rem 0.6rem 2.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    background-color: white;
+}
+
+.add-course-btn {
+    background-color: #2563ea;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-course-btn:hover {
+    background-color: #1d4ed8;
+}
+
+/* Table */
+.courses-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+.courses-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.courses-table th,
+.courses-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.courses-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    background-color: #fcfcfc;
+    white-space: nowrap;
+}
+
+.courses-table td {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.courses-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Specific Columns */
+.about-cell {
+    max-width: 250px;
+    font-size: 0.8rem !important;
+    color: #666 !important;
+    line-height: 1.4;
+}
+
+.duration-cell {
+    text-align: center;
+}
+
+.status-cell {
+    color: #666;
+}
+
+.active-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: #ecfdf5;
+    color: #10b981;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.view-lessons-btn {
+    color: #2563ea;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.view-lessons-btn:hover {
+    text-decoration: underline;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rows-per-page {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-btn {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
