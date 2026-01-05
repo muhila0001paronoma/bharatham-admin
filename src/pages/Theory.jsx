@@ -8,9 +8,9 @@ import { theoryData } from '../data/data';
 import './Theory.css';
 
 export default function Theory() {
-  const [selectedTopic, setSelectedTopic] = useState('Mudras');
+  const [selectedTopic, setSelectedTopic] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [theoryTopics, setTheoryTopics] = useState(theoryData.topics);
+  const [theoryTopics, setTheoryTopics] = useState([]);
   const [theoryDetails, setTheoryDetails] = useState(theoryData.details);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +19,43 @@ export default function Theory() {
   const [selectedTopicData, setSelectedTopicData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [isTopicDeleteModalOpen, setIsTopicDeleteModalOpen] = useState(false);
+  const [topicToDelete, setTopicToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch theory topics on mount
+  useEffect(() => {
+    fetchTopics();
+  }, []);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  const fetchTopics = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/topics`, {
+        headers: getAuthHeaders()
+      });
+      const result = await response.json();
+      if (result.success) {
+        setTheoryTopics(result.data);
+        if (result.data.length > 0 && !selectedTopic) {
+          setSelectedTopic(result.data[0].topicName);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching topics:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredData = theoryDetails.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -130,20 +167,38 @@ export default function Theory() {
     setIsTopicModalOpen(true);
   };
 
-  const handleSaveTopic = (formData) => {
-    if (selectedTopicData) {
-      setTheoryTopics(prev => 
-        prev.map(topic => 
-          topic === selectedTopicData 
-            ? formData.topicName 
-            : topic
-        )
-      );
-    } else {
-      setTheoryTopics(prev => [formData.topicName, ...prev]);
+  const handleSaveTopic = async (formData) => {
+    setIsLoading(true);
+    try {
+      const url = selectedTopicData
+        ? `${import.meta.env.VITE_API_URL}/theory/topics/${selectedTopicData.topicId}`
+        : `${import.meta.env.VITE_API_URL}/theory/topics`;
+
+      const method = selectedTopicData ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          topicName: formData.topicName
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchTopics();
+        setIsTopicModalOpen(false);
+        setSelectedTopicData(null);
+      } else {
+        alert(result.message || 'Failed to save topic');
+      }
+    } catch (error) {
+      console.error('Error saving topic:', error);
+      alert('An error occurred while saving the topic');
+    } finally {
+      setIsLoading(false);
     }
-    setIsTopicModalOpen(false);
-    setSelectedTopicData(null);
   };
 
   const handleCloseTopicModal = () => {
@@ -163,9 +218,9 @@ export default function Theory() {
 
   const handleSaveTheory = (formData) => {
     if (selectedTheoryData) {
-      setTheoryDetails(prev => 
-        prev.map(item => 
-          item.id === selectedTheoryData.id 
+      setTheoryDetails(prev =>
+        prev.map(item =>
+          item.id === selectedTheoryData.id
             ? { ...item, ...formData }
             : item
         )
@@ -197,11 +252,49 @@ export default function Theory() {
       setTheoryDetails(prev => prev.filter(item => item.id !== itemToDelete.id));
       setItemToDelete(null);
     }
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDeleteTopic = (e, topic) => {
+    e.stopPropagation();
+    setTopicToDelete(topic);
+    setIsTopicDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteTopic = async () => {
+    if (!topicToDelete) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/topics/${topicToDelete.topicId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchTopics();
+      } else {
+        alert(result.message || 'Failed to delete topic');
+      }
+    } catch (error) {
+      console.error('Error deleting topic:', error);
+      alert('An error occurred while deleting the topic');
+    } finally {
+      setIsLoading(false);
+      setIsTopicDeleteModalOpen(false);
+      setTopicToDelete(null);
+    }
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setItemToDelete(null);
+  };
+
+  const handleCloseTopicDeleteModal = () => {
+    setIsTopicDeleteModalOpen(false);
+    setTopicToDelete(null);
   };
 
   const handleFilter = () => {
@@ -268,23 +361,26 @@ export default function Theory() {
           </button>
         </div>
         <div className="theory-topics-container">
-          {theoryTopics.map((topic) => (
+          {theoryTopics.filter(t => t.isActive).map((topic) => (
             <div
-              key={topic}
-              className={`theory-topic-tag ${selectedTopic === topic ? 'theory-topic-tag-active' : ''}`}
-              onClick={() => {
-                setSelectedTopic(topic);
-                handleEditTopic(topic);
-              }}
+              key={topic.topicId}
+              className={`theory-topic-tag ${selectedTopic === topic.topicName ? 'theory-topic-tag-active' : ''}`}
+              onClick={() => setSelectedTopic(topic.topicName)}
             >
-              <span>{topic}</span>
-              <Edit2 
-                className="theory-topic-edit-icon" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditTopic(topic);
-                }}
-              />
+              <span>{topic.topicName}</span>
+              <div className="theory-topic-tag-actions">
+                <Edit2
+                  className="theory-topic-edit-icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditTopic(topic);
+                  }}
+                />
+                <Trash2
+                  className="theory-topic-delete-icon"
+                  onClick={(e) => handleDeleteTopic(e, topic)}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -341,6 +437,7 @@ export default function Theory() {
         onSave={handleSaveTheory}
         theoryData={selectedTheoryData}
         topics={theoryTopics}
+        isLoading={isLoading}
       />
 
       <TopicModal
@@ -349,6 +446,7 @@ export default function Theory() {
         onSave={handleSaveTopic}
         topicData={selectedTopicData}
         existingTopics={theoryTopics}
+        isLoading={isLoading}
       />
 
       <ConfirmationModal
@@ -357,6 +455,18 @@ export default function Theory() {
         onConfirm={handleConfirmDelete}
         title="Delete Theory Detail"
         message={`Are you sure you want to delete "${itemToDelete?.subTopic || 'this theory detail'}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        icon={Trash2}
+      />
+
+      <ConfirmationModal
+        isOpen={isTopicDeleteModalOpen}
+        onClose={handleCloseTopicDeleteModal}
+        onConfirm={handleConfirmDeleteTopic}
+        title="Delete Theory Topic"
+        message={`Are you sure you want to delete "${topicToDelete?.topicName}"? All theory details associated with this topic will also be affected. This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         type="danger"

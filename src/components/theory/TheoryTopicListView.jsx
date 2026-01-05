@@ -24,16 +24,16 @@ export default function TheoryTopicListView({ formData, onBack }) {
               <ArrowLeft size={18} color="#7A4D3A" />
             </div>
             <div className="theory-topic-list-title">
-              {formData.topic || 'Theory Topic'}
+              {formData.topic?.topicName || formData.topic || 'Theory Topic'}
             </div>
           </div>
 
           {/* Search Input */}
           <div className="theory-topic-list-search">
             <Search size={16} color="#BC6135" />
-            <input 
-              type="text" 
-              placeholder={`Search ${formData.topic || 'topics'}`}
+            <input
+              type="text"
+              placeholder={`Search ${formData.topic?.topicName || formData.topic || 'topics'}`}
               className="theory-topic-list-search-input"
             />
           </div>
@@ -42,9 +42,9 @@ export default function TheoryTopicListView({ formData, onBack }) {
           <div className="theory-topic-list-grid">
             <div className="theory-topic-list-card">
               {formData.image && (
-                <img 
-                  src={formData.image} 
-                  alt={formData.subTopic || 'Theory'} 
+                <img
+                  src={formData.image}
+                  alt={formData.subTopic || 'Theory'}
                   className="theory-topic-list-card-image"
                 />
               )}
@@ -52,10 +52,10 @@ export default function TheoryTopicListView({ formData, onBack }) {
                 {formData.subTopic || 'Sub Topic Name'}
               </div>
               <div className="theory-topic-list-card-desc">
-                {formData.description 
-                  ? (formData.description.length > 50 
-                      ? formData.description.slice(0, 50) + '...' 
-                      : formData.description)
+                {formData.description
+                  ? (formData.description.length > 50
+                    ? formData.description.slice(0, 50) + '...'
+                    : formData.description)
                   : 'Enter description...'}
               </div>
               <div className="theory-topic-list-card-button">

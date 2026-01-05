@@ -205,6 +205,23 @@
   opacity: 1;
 }
 
+.theory-topic-tag-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theory-topic-delete-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+  color: #ef4444;
+}
+
+.theory-topic-tag:hover .theory-topic-delete-icon {
+  opacity: 1;
+}
+
 /* Theory Details Section */
 .theory-details-toolbar {
   margin-bottom: 1rem;
@@ -535,4 +552,3 @@
     gap: 2rem;
   }
 }
-

@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import TheoryMobilePreview from './TheoryMobilePreview';
 import './TheoryModal.css';
 
-export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null, topics = [] }) {
+export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null, topics = [], isLoading = false }) {
   const [formData, setFormData] = useState({
     topic: '',
     subTopic: '',
@@ -138,8 +138,8 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
                 >
                   <option value="">Select a topic</option>
                   {topics.map((topic) => (
-                    <option key={topic} value={topic}>
-                      {topic}
+                    <option key={typeof topic === 'object' ? topic.topicId : topic} value={typeof topic === 'object' ? topic.topicName : topic}>
+                      {typeof topic === 'object' ? topic.topicName : topic}
                     </option>
                   ))}
                 </select>
@@ -195,8 +195,12 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
                 <button type="button" className="theory-form-cancel-btn" onClick={onClose}>
                   Cancel
                 </button>
-                <button type="submit" className="theory-form-submit-btn">
-                  {theoryData ? 'Update' : 'Add'} Theory Detail
+                <button
+                  type="submit"
+                  className="theory-form-submit-btn"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : (theoryData ? 'Update Theory Detail' : 'Add Theory Detail')}
                 </button>
               </div>
             </form>

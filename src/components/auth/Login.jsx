@@ -13,19 +13,44 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
 
-    if (email === 'teacher@gmail.com') {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('role', 'teacher');
-      navigate('/dashboard');
-    } else if (email === 'admin@gmail.com') {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('role', 'admin');
-      navigate('/dashboard');
-    } else {
-      alert('Please use admin@gmail.com or teacher@gmail.com');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const { token, role, firstName, lastName, email: userEmail } = result.data;
+
+        // Store auth data
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', role);
+        localStorage.setItem('user', JSON.stringify({
+          firstName,
+          lastName,
+          email: userEmail
+        }));
+
+        // Navigate to dashboard
+        navigate('/dashboard');
+      } else {
+        alert(result.message || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -101,16 +126,6 @@ export default function Login() {
             </div>
 
             <div className="login-options">
-              <div className="login-remember-me">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  className="login-checkbox"
-                />
-                <label htmlFor="remember" className="login-checkbox-label">
-                  Remember me
-                </label>
-              </div>
               <button
                 type="button"
                 className="login-forgot-password"
