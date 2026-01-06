@@ -6,10 +6,10 @@ export default function QuizMobilePreview({ formData, backgroundImage, questionD
   const totalQuestions = formData.totalQuestions || 5;
   const currentQuestion = 1;
   const progressPercentage = (currentQuestion / totalQuestions) * 100;
-  
+
   // Default background image matching frontend
   const defaultBgImage = backgroundImage || 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&q=80';
-  
+
   // Use question data if provided, otherwise use sample
   const questionText = questionData?.question || 'Sample question text will appear here. This is how the question will look on mobile devices.';
   const options = questionData?.options || ['Option 1', 'Option 2 (Selected)', 'Option 3', 'Option 4'];
@@ -30,16 +30,16 @@ export default function QuizMobilePreview({ formData, backgroundImage, questionD
 
         {/* Phone Content with Background */}
         <div className="quiz-mobile-content-wrapper">
-          <div 
+          <div
             className="quiz-mobile-background-image"
-            style={{ 
+            style={{
               backgroundImage: `url(${defaultBgImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center center',
               backgroundRepeat: 'no-repeat'
             }}
           ></div>
-          <div className="quiz-mobile-content">
+          <div className="quiz-mobile-content custom-scrollbar">
             {/* Header */}
             <div className="quiz-mobile-header">
               <div className="quiz-mobile-back-button">
@@ -54,8 +54,8 @@ export default function QuizMobilePreview({ formData, backgroundImage, questionD
             {/* Progress Bar */}
             <div className="quiz-mobile-progress-container">
               <div className="quiz-mobile-progress-bar">
-                <div 
-                  className="quiz-mobile-progress-fill" 
+                <div
+                  className="quiz-mobile-progress-fill"
                   style={{ width: `${progressPercentage}%` }}
                 ></div>
               </div>
@@ -78,7 +78,7 @@ export default function QuizMobilePreview({ formData, backgroundImage, questionD
               {/* Options */}
               <div className="quiz-mobile-options-container">
                 {options.map((option, index) => (
-                  <div 
+                  <div
                     key={index}
                     className={`quiz-mobile-option ${index === 1 ? 'quiz-mobile-option-selected' : ''}`}
                   >

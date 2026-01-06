@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 import './Login.css';
 
 export default function Login() {
@@ -15,7 +16,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
