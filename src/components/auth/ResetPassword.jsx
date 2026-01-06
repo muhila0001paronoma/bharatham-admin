@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, ArrowLeft, Key } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 import './ResetPassword.css';
 
 export default function ResetPassword() {
@@ -39,7 +40,7 @@ export default function ResetPassword() {
 
     try {
       // Step 1: Verify OTP
-      const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+      const verifyResponse = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +62,7 @@ export default function ResetPassword() {
       const { resetToken } = verifyResult.data;
 
       // Step 2: Reset Password
-      const resetResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
+      const resetResponse = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

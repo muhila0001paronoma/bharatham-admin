@@ -810,7 +810,10 @@
   }
 
   .quiz-modal-preview-section {
-    display: none;
+    display: block;
+    min-height: 450px;
+    margin-bottom: 1rem;
+    overflow-y: auto;
   }
 
   .quiz-modal-form-section {
@@ -860,4 +863,124 @@
     margin-left: 0;
     flex-wrap: wrap;
   }
+}
+
+/* Added for Question Form Integration */
+.quiz-answers-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quiz-answers-input-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.quiz-answer-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.quiz-correct-radio {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #22c55e;
+}
+
+.input-with-label-prefix {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input-prefix {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border-right: 1px solid #e2e8f0;
+  border-radius: 9px 0 0 9px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.85rem;
+  z-index: 1;
+}
+
+.input-with-label-prefix input {
+  padding-left: 3rem !important;
+  /* Space for prefix */
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  background: #ffffff;
+  outline: none;
+  font-weight: 500;
+}
+
+.input-with-label-prefix input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.correct-answer-row {
+  border-color: #22c55e !important;
+  background-color: #f0fdf4 !important;
+}
+
+.quiz-empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.quiz-empty-message {
+  text-align: center;
+  padding: 3rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+}
+
+.quiz-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.quiz-card-actions {
+  display: flex;
+  gap: 0.5rem;
 }

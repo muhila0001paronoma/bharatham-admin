@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './QuizPage.css';
-import { getTheoryQuizSubTopics, getTheoryQuizQuestions } from '../../data/data.js';
+import { theoryQuizService } from '../../services/theoryQuizService';
 import QuizMobilePreview from '../../components/quiz/QuizMobilePreview';
 import {
   Search,
-  RotateCw,
-  SquareArrowOutUpRight,
   Plus,
   Edit,
   Trash2,
-  Check,
   ExternalLink,
   BookOpen,
+  FileText,
   HelpCircle,
-  FileText
+  Loader
 } from 'lucide-react';
 import './../../components/ui/DataTable.css';
 
@@ -22,153 +20,174 @@ const TheoryQuiz = () => {
   const [questions, setQuestions] = useState([]);
   const [selectedSubTopic, setSelectedSubTopic] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Modal State
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
+  const [editingId, setEditingId] = useState(null);
+
+  // Form State (for Question)
   const [form, setForm] = useState({
-    title: '',
-    totalQuestions: 5,
-    type: 'Theory',
-    notes: ''
+    question: '',
+    answers: ['', '', '', ''],
+    correctIndex: 0,
+    explanation: ''
   });
 
-  // Answer edit/delete modals
-  const [showAnswerModal, setShowAnswerModal] = useState(false);
-  const [answerModalMode, setAnswerModalMode] = useState('add'); // 'add' | 'edit'
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answerForm, setAnswerForm] = useState({ text: '', correct: false });
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [answerToDelete, setAnswerToDelete] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    show: false,
+    id: null
+  });
 
+  // Load Sub Topics (Theory Details)
   useEffect(() => {
-    const loadQuizData = async () => {
-      const subTopicsData = await getTheoryQuizSubTopics();
-      const questionsData = await getTheoryQuizQuestions();
-      setSubTopics(subTopicsData);
-      setQuestions(questionsData);
-      if (subTopicsData.length > 0) {
-        setSelectedSubTopic(subTopicsData[0]);
-      }
-    };
-    loadQuizData();
+    fetchSubTopics();
   }, []);
+
+  const fetchSubTopics = async () => {
+    try {
+      const response = await theoryQuizService.getAllTheoryDetails();
+      if (response && response.data) {
+        setSubTopics(response.data);
+        if (response.data.length > 0 && !selectedSubTopic) {
+          setSelectedSubTopic(response.data[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load sub topics', error);
+    }
+  };
+
+  // Load Questions when Sub Topic changes
+  useEffect(() => {
+    if (selectedSubTopic?.detailId) {
+      fetchQuestions(selectedSubTopic.detailId);
+    } else {
+      setQuestions([]);
+    }
+  }, [selectedSubTopic]);
+
+  const fetchQuestions = async (detailId) => {
+    setIsLoading(true);
+    try {
+      const response = await theoryQuizService.getQuizzesByDetailId(detailId);
+      if (response && response.data) {
+        setQuestions(response.data);
+      } else {
+        setQuestions([]);
+      }
+    } catch (error) {
+      console.error('Failed to load questions', error);
+      setQuestions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Filter sub topics based on search
   const filteredSubTopics = subTopics.filter(topic =>
-    topic.toLowerCase().includes(searchQuery.toLowerCase())
+    topic.subTopicName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const openModal = (mode = 'add', defaults = {}) => {
-    setModalMode(mode);
+  // Form Handlers
+  const handleOpenAdd = () => {
+    setModalMode('add');
     setForm({
-      title: defaults.title ?? '',
-      totalQuestions: defaults.totalQuestions ?? 5,
-      type: defaults.type ?? 'Theory',
-      notes: defaults.notes ?? ''
+      question: '',
+      answers: ['', '', '', ''],
+      correctIndex: 0,
+      explanation: ''
+    });
+    setEditingId(null);
+    setShowModal(true);
+  };
+
+  const handleOpenEdit = (q) => {
+    setModalMode('edit');
+    setEditingId(q.id);
+
+    // Determine correct index based on text match
+    // Backend correct answer is the text string
+    const answers = [q.answer1, q.answer2, q.answer3, q.answer4];
+    let cIndex = answers.findIndex(a => a === q.correctAnswer);
+    if (cIndex === -1) cIndex = 0; // Fallback
+
+    setForm({
+      question: q.question,
+      answers: answers,
+      correctIndex: cIndex,
+      explanation: q.explanation || ''
     });
     setShowModal(true);
   };
 
-  const closeModal = () => setShowModal(false);
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const closeModal = () => {
+    setShowModal(false);
   };
-  const handleSubmit = (e) => {
+
+  const handleFormChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAnswerChange = (index, value) => {
+    const newAnswers = [...form.answers];
+    newAnswers[index] = value;
+    setForm(prev => ({ ...prev, answers: newAnswers }));
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    // placeholder: integrate API call for add/edit quiz
-    closeModal();
-  };
+    if (!selectedSubTopic) return;
 
-  // Sub Topic handlers
-  const handleSubTopicClick = (topic) => {
-    setSelectedSubTopic(topic);
-  };
+    // Validation
+    if (!form.question.trim()) return alert("Question is required");
+    if (form.answers.some(a => !a.trim())) return alert("All 4 answers are required");
 
-  // Answer handlers
-  const handleAddAnswer = (question) => {
-    setSelectedQuestion(question);
-    setSelectedAnswer(null);
-    setAnswerForm({ text: '', correct: false });
-    setAnswerModalMode('add');
-    setShowAnswerModal(true);
-  };
+    const payload = {
+      theoryDetailId: selectedSubTopic.detailId,
+      question: form.question,
+      answer1: form.answers[0],
+      answer2: form.answers[1],
+      answer3: form.answers[2],
+      answer4: form.answers[3],
+      correctAnswer: form.answers[form.correctIndex],
+      explanation: form.explanation
+    };
 
-  const handleEditAnswer = (question, answer, answerIndex) => {
-    setSelectedQuestion(question);
-    setSelectedAnswer({ ...answer, index: answerIndex });
-    setAnswerForm({ text: answer.text, correct: answer.correct || false });
-    setAnswerModalMode('edit');
-    setShowAnswerModal(true);
-  };
-
-  const handleDeleteAnswer = (question, answerIndex) => {
-    setSelectedQuestion(question);
-    setAnswerToDelete({ question, answerIndex });
-    setShowDeleteConfirm(true);
-  };
-
-  const confirmDeleteAnswer = () => {
-    if (answerToDelete) {
-      setQuestions(prev => prev.map(q => {
-        if (q.id === answerToDelete.question.id) {
-          return {
-            ...q,
-            answers: q.answers.filter((_, idx) => idx !== answerToDelete.answerIndex)
-          };
-        }
-        return q;
-      }));
-      setShowDeleteConfirm(false);
-      setAnswerToDelete(null);
+    try {
+      if (modalMode === 'add') {
+        await theoryQuizService.createQuiz(payload);
+      } else {
+        await theoryQuizService.updateQuiz(editingId, payload);
+      }
+      closeModal();
+      fetchQuestions(selectedSubTopic.detailId);
+    } catch (error) {
+      console.error('Failed to save quiz', error);
+      alert('Failed to save quiz. Please try again.');
     }
   };
 
-  const handleAnswerSubmit = (e) => {
-    e.preventDefault();
-    if (!selectedQuestion) return;
+  const handleDeleteClick = (id) => {
+    setDeleteConfirm({ show: true, id });
+  };
 
-    setQuestions(prev => prev.map(q => {
-      if (q.id === selectedQuestion.id) {
-        if (answerModalMode === 'edit' && selectedAnswer !== null) {
-          // Update existing answer
-          const newAnswers = [...q.answers];
-          newAnswers[selectedAnswer.index] = {
-            text: answerForm.text,
-            correct: answerForm.correct
-          };
-          return { ...q, answers: newAnswers };
-        } else {
-          // Add new answer
-          return {
-            ...q,
-            answers: [...q.answers, {
-              text: answerForm.text,
-              correct: answerForm.correct
-            }]
-          };
-        }
+  const confirmDelete = async () => {
+    if (deleteConfirm.id) {
+      try {
+        await theoryQuizService.deleteQuiz(deleteConfirm.id);
+        fetchQuestions(selectedSubTopic.detailId);
+      } catch (error) {
+        console.error('Failed to delete quiz', error);
       }
-      return q;
-    }));
-
-    setShowAnswerModal(false);
-    setSelectedQuestion(null);
-    setSelectedAnswer(null);
-    setAnswerForm({ text: '', correct: false });
+    }
+    setDeleteConfirm({ show: false, id: null });
   };
 
-  const handleAnswerChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setAnswerForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const totalQuizzes = questions.length;
+  // Stats
   const totalSubTopics = subTopics.length;
+  const totalQuestions = questions.length;
 
   return (
     <div className="quiz-page">
@@ -180,7 +199,7 @@ const TheoryQuiz = () => {
             </div>
             <div>
               <h1 className="theory-page-header-title">Theory Quiz</h1>
-              <p className="theory-page-header-subtitle">Manage questions, answers, and sub-topics for theory quizzes</p>
+              <p className="theory-page-header-subtitle">Manage questions for {selectedSubTopic ? selectedSubTopic.subTopicName : 'Theory Topics'}</p>
             </div>
           </div>
           <div className="theory-page-header-stats">
@@ -198,8 +217,8 @@ const TheoryQuiz = () => {
                 <FileText size={20} />
               </div>
               <div className="theory-page-stat-content">
-                <div className="theory-page-stat-value">{totalQuizzes}</div>
-                <div className="theory-page-stat-label">Total Questions</div>
+                <div className="theory-page-stat-value">{totalQuestions}</div>
+                <div className="theory-page-stat-label">Questions</div>
               </div>
             </div>
           </div>
@@ -225,83 +244,94 @@ const TheoryQuiz = () => {
           </div>
 
           <div className="quiz-subtopic-list">
-            {filteredSubTopics.map((name) => (
+            {filteredSubTopics.map((topic) => (
               <button
-                key={name}
-                className={`quiz-subtopic ${selectedSubTopic === name ? 'active' : ''}`}
-                onClick={() => handleSubTopicClick(name)}
+                key={topic.detailId}
+                className={`quiz-subtopic ${selectedSubTopic?.detailId === topic.detailId ? 'active' : ''}`}
+                onClick={() => setSelectedSubTopic(topic)}
               >
-                {name}
+                {topic.subTopicName}
               </button>
             ))}
+            {filteredSubTopics.length === 0 && (
+              <div className="quiz-empty-state">No sub topics found</div>
+            )}
           </div>
         </aside>
 
         {/* Right Content - Questions */}
         <section className="quiz-main-area">
           <div className="quiz-main-header">
-            <span className="quiz-total-count">Total Questions - {questions.length.toString().padStart(2, '0')}</span>
-            <button className="quiz-btn primary" onClick={() => openModal('add')}>
+            <span className="quiz-total-count">
+              {selectedSubTopic ? `Questions for ${selectedSubTopic.subTopicName}` : 'Select a Sub Topic'}
+              {selectedSubTopic && ` - ${questions.length} Items`}
+            </span>
+            <button
+              className="quiz-btn primary"
+              onClick={handleOpenAdd}
+              disabled={!selectedSubTopic}
+            >
               <Plus size={18} style={{ marginRight: '6px' }} />
-              Add New Quiz
+              Add Question
             </button>
           </div>
 
-          <div className="quiz-questions-list">
-            {questions.map((q, qIdx) => (
-              <div key={q.id} className="quiz-card">
-                <div className="quiz-card-header">
-                  <div className="quiz-chip">Q{qIdx + 1}</div>
-                  <h4 className="quiz-question-text">{q.question}</h4>
-                  <button
-                    className="quiz-btn add-answer-btn"
-                    onClick={() => handleAddAnswer(q)}
-                  >
-                    <Plus size={14} />
-                    Add Answer
-                  </button>
-                </div>
-
-                <div className="quiz-answers">
-                  {q.answers.map((ans, ansIdx) => (
-                    <div key={ansIdx} className="quiz-answer">
-                      <span className="quiz-answer-text">{ans.text}</span>
-                      <div className="quiz-answer-actions">
-                        {ans.correct && (
-                          <span className="quiz-pill success">
-                            Correct Answer
-                          </span>
-                        )}
-                        <button
-                          className="data-table-action-button data-table-action-edit"
-                          aria-label="edit"
-                          onClick={() => handleEditAnswer(q, ans, ansIdx)}
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          className="data-table-action-button data-table-action-delete"
-                          aria-label="delete"
-                          onClick={() => handleDeleteAnswer(q, ansIdx)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+          {isLoading ? (
+            <div className="quiz-loading">
+              <Loader className="animate-spin" size={32} />
+              <p>Loading questions...</p>
+            </div>
+          ) : (
+            <div className="quiz-questions-list">
+              {questions.length === 0 && selectedSubTopic && (
+                <div className="quiz-empty-message">No questions found for this topic. Add one to get started.</div>
+              )}
+              {questions.map((q, qIdx) => (
+                <div key={q.id} className="quiz-card">
+                  <div className="quiz-card-header">
+                    <div className="quiz-chip">Q{qIdx + 1}</div>
+                    <h4 className="quiz-question-text">{q.question}</h4>
+                    <div className="quiz-card-actions">
+                      <button
+                        className="data-table-action-button data-table-action-edit"
+                        aria-label="edit"
+                        onClick={() => handleOpenEdit(q)}
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        className="data-table-action-button data-table-action-delete"
+                        aria-label="delete"
+                        onClick={() => handleDeleteClick(q.id)}
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
-                  ))}
-                </div>
-
-                {q.note && (
-                  <div className="quiz-note-wrapper">
-                    <p className="quiz-note-text">{q.note}</p>
-                    <button className="data-table-action-button data-table-action-edit note-edit" aria-label="edit note">
-                      <Edit size={16} />
-                    </button>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+
+                  <div className="quiz-answers">
+                    {[q.answer1, q.answer2, q.answer3, q.answer4].map((ans, ansIdx) => {
+                      const isCorrect = ans === q.correctAnswer;
+                      return (
+                        <div key={ansIdx} className={`quiz-answer ${isCorrect ? 'correct-answer-row' : ''}`}>
+                          <span className="quiz-answer-text">{String.fromCharCode(65 + ansIdx)}. {ans}</span>
+                          {isCorrect && (
+                            <span className="quiz-pill success">Correct Answer</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {q.explanation && (
+                    <div className="quiz-note-wrapper">
+                      <p className="quiz-note-text"><strong>Explanation:</strong> {q.explanation}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
@@ -310,58 +340,65 @@ const TheoryQuiz = () => {
           <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="quiz-modal-header">
               <h3 className="quiz-modal-title">
-                {modalMode === 'edit' ? 'Edit Quiz' : 'Add New Quiz'}
+                {modalMode === 'edit' ? 'Edit Question' : 'Add New Question'}
               </h3>
               <button className="quiz-modal-close" aria-label="Close" onClick={closeModal}>✕</button>
             </div>
             <div className="quiz-modal-body">
               {/* Left Side - Form */}
               <div className="quiz-modal-form-section">
-                <form className="quiz-modal-form" onSubmit={handleSubmit}>
+                <form className="quiz-modal-form" onSubmit={handleSave}>
                   <div className="quiz-modal-field">
-                    <label htmlFor="title">Quiz Title</label>
-                    <input
-                      id="title"
-                      name="title"
-                      value={form.title}
-                      onChange={handleChange}
-                      placeholder="Enter quiz title"
-                      required
-                    />
-                  </div>
-                  <div className="quiz-modal-field">
-                    <label htmlFor="totalQuestions">Total Questions</label>
-                    <input
-                      id="totalQuestions"
-                      name="totalQuestions"
-                      type="number"
-                      min="1"
-                      value={form.totalQuestions}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="quiz-modal-field">
-                    <label htmlFor="type">Quiz Type</label>
-                    <select id="type" name="type" value={form.type} onChange={handleChange}>
-                      <option value="Theory">Theory</option>
-                      <option value="Technique">Technique</option>
-                    </select>
-                  </div>
-                  <div className="quiz-modal-field">
-                    <label htmlFor="notes">Notes</label>
+                    <label htmlFor="question">Question Text</label>
                     <textarea
-                      id="notes"
-                      name="notes"
+                      id="question"
+                      value={form.question}
+                      onChange={(e) => handleFormChange('question', e.target.value)}
+                      placeholder="Enter question..."
                       rows="3"
-                      value={form.notes}
-                      onChange={handleChange}
-                      placeholder="Any additional details..."
+                      required
                     />
                   </div>
+
+                  <div className="quiz-answers-input-group">
+                    <label>Answers (Select the radio button for the correct answer)</label>
+                    {form.answers.map((ans, idx) => (
+                      <div key={idx} className="quiz-answer-input-row">
+                        <input
+                          type="radio"
+                          name="correctAnswer"
+                          checked={form.correctIndex === idx}
+                          onChange={() => handleFormChange('correctIndex', idx)}
+                          className="quiz-correct-radio"
+                          title="Mark as correct"
+                        />
+                        <div className="input-with-label-prefix">
+                          <span className="input-prefix">{String.fromCharCode(65 + idx)}</span>
+                          <input
+                            value={ans}
+                            onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                            placeholder={`Answer Option ${idx + 1}`}
+                            required
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="quiz-modal-field">
+                    <label htmlFor="explanation">Explanation / Notes (Optional)</label>
+                    <textarea
+                      id="explanation"
+                      value={form.explanation}
+                      onChange={(e) => handleFormChange('explanation', e.target.value)}
+                      placeholder="Explain why the answer is correct..."
+                      rows="2"
+                    />
+                  </div>
+
                   <div className="quiz-modal-actions">
                     <button type="button" className="quiz-btn secondary" onClick={closeModal}>Cancel</button>
-                    <button type="submit" className="quiz-btn primary">Save Quiz</button>
+                    <button type="submit" className="quiz-btn primary">Save Question</button>
                   </div>
                 </form>
               </div>
@@ -371,70 +408,35 @@ const TheoryQuiz = () => {
                 <div className="quiz-preview-header">
                   <h3 className="quiz-preview-title">Mobile Preview</h3>
                 </div>
-                <QuizMobilePreview formData={form} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Answer Modal */}
-      {showAnswerModal && (
-        <div className="quiz-modal-overlay" role="dialog" aria-modal="true" onClick={() => setShowAnswerModal(false)}>
-          <div className="quiz-modal-content quiz-modal-small" onClick={(e) => e.stopPropagation()}>
-            <div className="quiz-modal-header">
-              <h3 className="quiz-modal-title">
-                {answerModalMode === 'edit' ? 'Edit Answer' : 'Add Answer'}
-              </h3>
-              <button className="quiz-modal-close" aria-label="Close" onClick={() => setShowAnswerModal(false)}>✕</button>
-            </div>
-            <form className="quiz-modal-form" onSubmit={handleAnswerSubmit}>
-              <div className="quiz-modal-field">
-                <label htmlFor="answerText">Answer Text</label>
-                <input
-                  id="answerText"
-                  name="text"
-                  value={answerForm.text}
-                  onChange={handleAnswerChange}
-                  placeholder="Enter answer text"
-                  required
+                <QuizMobilePreview
+                  formData={{
+                    title: selectedSubTopic?.subTopicName || 'Quiz',
+                    notes: form.explanation
+                  }}
+                  questionData={{
+                    question: form.question || 'Your question here...',
+                    options: form.answers.map(a => a || 'Option...')
+                  }}
                 />
               </div>
-              <div className="quiz-modal-field">
-                <label className="quiz-checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="correct"
-                    checked={answerForm.correct}
-                    onChange={handleAnswerChange}
-                  />
-                  <span>Mark as Correct Answer</span>
-                </label>
-              </div>
-              <div className="quiz-modal-actions">
-                <button type="button" className="quiz-btn secondary" onClick={() => setShowAnswerModal(false)}>Cancel</button>
-                <button type="submit" className="quiz-btn primary">
-                  {answerModalMode === 'edit' ? 'Update' : 'Add'} Answer
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="quiz-modal-overlay" role="dialog" aria-modal="true" onClick={() => setShowDeleteConfirm(false)}>
+      {deleteConfirm.show && (
+        <div className="quiz-modal-overlay" role="dialog" aria-modal="true" onClick={() => setDeleteConfirm({ show: false, id: null })}>
           <div className="quiz-modal-content quiz-modal-small" onClick={(e) => e.stopPropagation()}>
             <div className="quiz-modal-header">
-              <h3 className="quiz-modal-title">Delete Answer</h3>
-              <button className="quiz-modal-close" aria-label="Close" onClick={() => setShowDeleteConfirm(false)}>✕</button>
+              <h3 className="quiz-modal-title">Delete Question</h3>
+              <button className="quiz-modal-close" aria-label="Close" onClick={() => setDeleteConfirm({ show: false, id: null })}>✕</button>
             </div>
             <div className="quiz-modal-body">
-              <p>Are you sure you want to delete this answer? This action cannot be undone.</p>
+              <p>Are you sure you want to delete this question? This action cannot be undone.</p>
               <div className="quiz-modal-actions">
-                <button type="button" className="quiz-btn secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-                <button type="button" className="quiz-btn danger" onClick={confirmDeleteAnswer}>Delete</button>
+                <button type="button" className="quiz-btn secondary" onClick={() => setDeleteConfirm({ show: false, id: null })}>Cancel</button>
+                <button type="button" className="quiz-btn danger" onClick={confirmDelete}>Delete</button>
               </div>
             </div>
           </div>

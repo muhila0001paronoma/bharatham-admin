@@ -69,7 +69,8 @@ export default function TechniqueModal({ isOpen, onClose, onSave, techniqueData 
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          [imageKey]: reader.result
+          [imageKey]: reader.result,
+          [imageKey + 'File']: file
         }));
       };
       reader.readAsDataURL(file);
@@ -79,7 +80,8 @@ export default function TechniqueModal({ isOpen, onClose, onSave, techniqueData 
   const handleRemoveImage = (imageKey) => {
     setFormData(prev => ({
       ...prev,
-      [imageKey]: ''
+      [imageKey]: '',
+      [imageKey + 'File']: null
     }));
   };
 
