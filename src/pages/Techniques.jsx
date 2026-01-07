@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit2, Lightbulb, FileText, TrendingUp, Users, Trash2 } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import TechniqueModal from '../components/technique/TechniqueModal';
 import TechniqueTopicModal from '../components/technique/TechniqueTopicModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { techniquesData } from '../data/data';
+import { techniqueService } from '../services/techniqueService';
 import './Techniques.css';
 
 export default function Techniques() {
-  const [selectedTopic, setSelectedTopic] = useState('Body Postures');
+  const [selectedTopic, setSelectedTopic] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [techniqueTopics, setTechniqueTopics] = useState(techniquesData.topics);
-  const [techniqueDetails, setTechniqueDetails] = useState(techniquesData.details);
+  const [techniqueTopics, setTechniqueTopics] = useState([]);
+  const [techniqueDetails, setTechniqueDetails] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTechniqueData, setSelectedTechniqueData] = useState(null);
@@ -20,15 +20,66 @@ export default function Techniques() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
+  // Maps for ID <-> Name conversion
+  const [topicsMap, setTopicsMap] = useState({}); // id -> name
+  const [topicsReverseMap, setTopicsReverseMap] = useState({}); // name -> id
+
+  const loadData = async () => {
+    try {
+      // Load Topics
+      const topicsResponse = await techniqueService.getAllTopics();
+      const topics = topicsResponse.data || [];
+      const tMap = {};
+      const tRevMap = {};
+      const topicNames = [];
+      topics.forEach(t => {
+        tMap[t.id] = t.topicName;
+        tRevMap[t.topicName] = t.id;
+        topicNames.push(t.topicName);
+      });
+      setTopicsMap(tMap);
+      setTopicsReverseMap(tRevMap);
+      setTechniqueTopics(topicNames);
+
+      if (topicNames.length > 0 && (!selectedTopic || !topicNames.includes(selectedTopic))) {
+        setSelectedTopic(topicNames[0]);
+      }
+
+      // Load Details
+      const detailsResponse = await techniqueService.getAllDetails();
+      const details = detailsResponse.data || [];
+      const mappedDetails = details.map(d => ({
+        id: d.id,
+        name: d.name,
+        topic: tMap[d.topicId] || d.topicId,
+        topicId: d.topicId,
+        description: d.description,
+        level: d.level ? d.level.charAt(0).toUpperCase() + d.level.slice(1).toLowerCase() : '',
+        keyPoints: d.keyPoints,
+        active: d.isActive,
+        imgUrl1: d.imgUrl1,
+        imgUrl2: d.imgUrl2,
+        imgUrl3: d.imgUrl3
+      }));
+      setTechniqueDetails(mappedDetails);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const filteredData = techniqueDetails.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       item.name.toLowerCase().includes(query) ||
-      item.topic.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.keyPoints.toLowerCase().includes(query) ||
-      item.level.toLowerCase().includes(query)
+      (item.topic && item.topic.toLowerCase().includes(query)) ||
+      (item.description && item.description.toLowerCase().includes(query)) ||
+      (item.keyPoints && item.keyPoints.toLowerCase().includes(query)) ||
+      (item.level && item.level.toLowerCase().includes(query))
     );
   });
 
@@ -101,7 +152,7 @@ export default function Techniques() {
       width: '300px',
       render: (value) => (
         <div className="technique-table-keypoints" title={value}>
-          {value.length > 100 ? `${value.substring(0, 100)}...` : value}
+          {value && value.length > 100 ? `${value.substring(0, 100)}...` : value}
         </div>
       )
     },
@@ -123,25 +174,30 @@ export default function Techniques() {
     setIsTopicModalOpen(true);
   };
 
-  const handleEditTopic = (topic) => {
-    setSelectedTopicData(topic);
+  const handleEditTopic = (topicName) => {
+    setSelectedTopicData(topicName);
     setIsTopicModalOpen(true);
   };
 
-  const handleSaveTopic = (formData) => {
-    if (selectedTopicData) {
-      setTechniqueTopics(prev => 
-        prev.map(topic => 
-          topic === selectedTopicData 
-            ? formData.topicName 
-            : topic
-        )
-      );
-    } else {
-      setTechniqueTopics(prev => [formData.topicName, ...prev]);
+  const handleSaveTopic = async (formData) => {
+    try {
+      if (selectedTopicData) {
+        // Update
+        const id = topicsReverseMap[selectedTopicData];
+        if (id) {
+          await techniqueService.updateTopic(id, { topicName: formData.topicName });
+        }
+      } else {
+        // Create
+        await techniqueService.createTopic({ topicName: formData.topicName });
+      }
+      loadData();
+      setIsTopicModalOpen(false);
+      setSelectedTopicData(null);
+    } catch (error) {
+      console.error("Error saving topic:", error);
+      alert("Failed to save topic");
     }
-    setIsTopicModalOpen(false);
-    setSelectedTopicData(null);
   };
 
   const handleCloseTopicModal = () => {
@@ -159,25 +215,30 @@ export default function Techniques() {
     setIsModalOpen(true);
   };
 
-  const handleSaveTechnique = (formData) => {
-    if (selectedTechniqueData) {
-      setTechniqueDetails(prev => 
-        prev.map(item => 
-          item.id === selectedTechniqueData.id 
-            ? { ...item, ...formData, active: true }
-            : item
-        )
-      );
-    } else {
-      const newTechnique = {
-        id: techniqueDetails.length + 1,
+  const handleSaveTechnique = async (formData) => {
+    try {
+      const topicId = topicsReverseMap[formData.topic];
+      if (!topicId) {
+        alert("Invalid Topic selected");
+        return;
+      }
+      const payload = {
         ...formData,
-        active: true
+        topicId: topicId
       };
-      setTechniqueDetails(prev => [...prev, newTechnique]);
+
+      if (selectedTechniqueData) {
+        await techniqueService.updateDetail(selectedTechniqueData.id, payload);
+      } else {
+        await techniqueService.createDetail(payload);
+      }
+      loadData();
+      setIsModalOpen(false);
+      setSelectedTechniqueData(null);
+    } catch (error) {
+      console.error("Error saving detail:", error);
+      alert("Failed to save technique detail");
     }
-    setIsModalOpen(false);
-    setSelectedTechniqueData(null);
   };
 
   const handleCloseModal = () => {
@@ -190,10 +251,17 @@ export default function Techniques() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      setTechniqueDetails(prev => prev.filter(item => item.id !== itemToDelete.id));
-      setItemToDelete(null);
+      try {
+        await techniqueService.deleteDetail(itemToDelete.id);
+        loadData();
+        setItemToDelete(null);
+        setIsDeleteModalOpen(false);
+      } catch (error) {
+        console.error("Error deleting detail:", error);
+        alert("Failed to delete");
+      }
     }
   };
 
@@ -273,12 +341,11 @@ export default function Techniques() {
               className={`technique-topic-tag ${selectedTopic === topic ? 'technique-topic-tag-active' : ''}`}
               onClick={() => {
                 setSelectedTopic(topic);
-                handleEditTopic(topic);
               }}
             >
               <span>{topic}</span>
-              <Edit2 
-                className="technique-topic-edit-icon" 
+              <Edit2
+                className="technique-topic-edit-icon"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleEditTopic(topic);

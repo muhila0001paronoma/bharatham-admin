@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { Search, Filter, Plus, Edit2, BookOpen, FileText, TrendingUp, Users, Trash2 } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import TheoryModal from '../components/theory/TheoryModal';
@@ -48,7 +49,7 @@ export default function Theory() {
   const fetchTopics = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/topics`, {
+      const response = await fetch(`${API_BASE_URL}/theory/topics`, {
         headers: getAuthHeaders()
       });
       const result = await response.json();
@@ -196,8 +197,8 @@ export default function Theory() {
     setIsLoading(true);
     try {
       const url = selectedTopicData
-        ? `${import.meta.env.VITE_API_URL}/theory/topics/${selectedTopicData.topicId}`
-        : `${import.meta.env.VITE_API_URL}/theory/topics`;
+        ? `${API_BASE_URL}/theory/topics/${selectedTopicData.topicId}`
+        : `${API_BASE_URL}/theory/topics`;
 
       const method = selectedTopicData ? 'PUT' : 'POST';
 
@@ -330,7 +331,7 @@ export default function Theory() {
     if (!topicToDelete) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/topics/${topicToDelete.topicId}`, {
+      const response = await fetch(`${API_BASE_URL}/theory/topics/${topicToDelete.topicId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
