@@ -97,7 +97,7 @@ const DataTable = ({
     if (!selectable) return;
     const allSelected = paginatedData.length === Array.from(selectedRows).filter(idx => idx >= startIndex && idx < endIndex).length;
     const newSelected = new Set(selectedRows);
-    
+
     if (allSelected) {
       // Deselect all on current page
       paginatedData.forEach((_, idx) => {
@@ -116,7 +116,7 @@ const DataTable = ({
   };
 
   // Check if all rows on current page are selected
-  const allSelectedOnPage = paginatedData.length > 0 && 
+  const allSelectedOnPage = paginatedData.length > 0 &&
     paginatedData.every((_, idx) => selectedRows.has(startIndex + idx));
 
   return (
@@ -143,9 +143,12 @@ const DataTable = ({
                     column.sortable && 'data-table-header-sortable'
                   )}
                   onClick={() => column.sortable && handleSort(column.key)}
-                  style={{ width: column.width }}
+                  style={{ width: column.width, textAlign: column.align || 'left' }}
                 >
-                  <div className="data-table-header-content">
+                  <div
+                    className="data-table-header-content"
+                    style={{ justifyContent: column.align === 'center' ? 'center' : (column.align === 'right' ? 'flex-end' : 'flex-start') }}
+                  >
                     <span>{column.label}</span>
                     {column.sortable && (
                       <div className="data-table-sort-icons">
@@ -197,7 +200,11 @@ const DataTable = ({
                       </td>
                     )}
                     {columns.map((column) => (
-                      <td key={column.key} className="data-table-cell">
+                      <td
+                        key={column.key}
+                        className="data-table-cell"
+                        style={{ textAlign: column.align || 'left' }}
+                      >
                         {column.render ? column.render(row[column.key], row, actualRowIndex) : row[column.key]}
                       </td>
                     ))}

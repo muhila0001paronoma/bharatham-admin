@@ -7,13 +7,14 @@ import './TheoryModal.css';
 
 export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null, topics = [], isLoading = false }) {
   const [formData, setFormData] = useState({
-    topic: '',
-    subTopic: '',
+    topicId: '',
+    subTopicName: '',
     description: '',
     notes: '',
     image: '',
-    active: true
+    isActive: true
   });
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -30,24 +31,26 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
   useEffect(() => {
     if (theoryData) {
       setFormData({
-        topic: theoryData.topic || '',
-        subTopic: theoryData.subTopic || '',
+        topicId: theoryData.topicId || '',
+        subTopicName: theoryData.subTopicName || '',
         description: theoryData.description || '',
         notes: theoryData.notes || '',
-        image: theoryData.image || '',
-        active: theoryData.active !== undefined ? theoryData.active : true
+        image: theoryData.imageUrl || '',
+        isActive: theoryData.isActive !== undefined ? theoryData.isActive : true
       });
+      setImageFile(null);
     } else {
       setFormData({
-        topic: '',
-        subTopic: '',
+        topicId: topics.length > 0 ? topics[0].topicId : '',
+        subTopicName: '',
         description: '',
         notes: '',
         image: '',
-        active: true
+        isActive: true
       });
+      setImageFile(null);
     }
-  }, [theoryData, isOpen]);
+  }, [theoryData, isOpen, topics]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -60,6 +63,7 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
@@ -73,7 +77,11 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    const submitData = {
+      ...formData,
+      file: imageFile
+    };
+    onSave(submitData);
   };
 
   if (!isOpen) return null;
@@ -115,7 +123,10 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
                       <button
                         type="button"
                         className="theory-form-image-remove"
-                        onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                        onClick={() => {
+                          setFormData(prev => ({ ...prev, image: '' }));
+                          setImageFile(null);
+                        }}
                       >
                         Remove
                       </button>
@@ -125,35 +136,35 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
               </div>
 
               <div className="theory-form-group">
-                <label htmlFor="topic" className="theory-form-label">
+                <label htmlFor="topicId" className="theory-form-label">
                   Topic
                 </label>
                 <select
-                  id="topic"
-                  name="topic"
-                  value={formData.topic}
+                  id="topicId"
+                  name="topicId"
+                  value={formData.topicId}
                   onChange={handleChange}
                   className="theory-form-select"
                   required
                 >
                   <option value="">Select a topic</option>
-                  {topics.map((topic) => (
-                    <option key={typeof topic === 'object' ? topic.topicId : topic} value={typeof topic === 'object' ? topic.topicName : topic}>
-                      {typeof topic === 'object' ? topic.topicName : topic}
+                  {topics.filter(topic => topic.isActive).map((topic) => (
+                    <option key={topic.topicId} value={topic.topicId}>
+                      {topic.topicName}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="theory-form-group">
-                <label htmlFor="subTopic" className="theory-form-label">
+                <label htmlFor="subTopicName" className="theory-form-label">
                   Sub Topic
                 </label>
                 <Input
-                  id="subTopic"
-                  name="subTopic"
+                  id="subTopicName"
+                  name="subTopicName"
                   type="text"
-                  value={formData.subTopic}
+                  value={formData.subTopicName}
                   onChange={handleChange}
                   placeholder="Enter sub topic name"
                   required
@@ -211,11 +222,18 @@ export default function TheoryModal({ isOpen, onClose, onSave, theoryData = null
             <div className="theory-preview-header">
               <h3 className="theory-preview-title">Mobile Preview</h3>
             </div>
-            <TheoryMobilePreview formData={formData} />
+            <TheoryMobilePreview formData={{
+              topic: topics.find(t => t.topicId === formData.topicId)?.topicName || '',
+              subTopic: formData.subTopicName,
+              description: formData.description,
+              image: formData.image,
+              notes: formData.notes
+            }} />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 

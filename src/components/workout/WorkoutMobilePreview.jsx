@@ -1,27 +1,24 @@
 import React from 'react';
 import './WorkoutMobilePreview.css';
 
-const getYoutubeVideoId = (url) => {
-  if (!url) return null;
-  if (url.includes('watch?v=')) {
-    return url.split('watch?v=')[1].split('&')[0];
-  }
-  if (url.includes('youtu.be/')) {
-    return url.split('youtu.be/')[1].split('?')[0];
-  }
-  return null;
-};
-
-const getVideoThumbnailUrl = (videoUrl) => {
-  const youtubeId = getYoutubeVideoId(videoUrl);
-  if (youtubeId) {
-    return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-  }
-  return null;
-};
-
 export default function WorkoutMobilePreview({ formData }) {
-  const thumbnailUrl = getVideoThumbnailUrl(formData.videoUrl);
+  const videoSource = React.useMemo(() => {
+    if (formData.video) {
+      return URL.createObjectURL(formData.video);
+    }
+    return formData.videoUrl || null;
+  }, [formData.video, formData.videoUrl]);
+
+  // Clean up object URL to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (videoSource && videoSource.startsWith('blob:')) {
+        URL.revokeObjectURL(videoSource);
+      }
+    };
+  }, [videoSource]);
+
+  const hasVideo = !!videoSource;
 
   return (
     <div className="workout-mobile-preview-container">
@@ -40,27 +37,20 @@ export default function WorkoutMobilePreview({ formData }) {
             <div className="workout-mobile-title">Workouts</div>
           </div>
 
-          {formData.videoUrl && (
+          {hasVideo && (
             <div className="workout-mobile-card">
               <div className="workout-mobile-card-content">
                 <div className="workout-mobile-thumbnail-container">
-                  {thumbnailUrl ? (
-                    <img 
-                      src={thumbnailUrl} 
-                      alt={formData.title || 'Workout'} 
-                      className="workout-mobile-thumbnail"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="workout-mobile-thumbnail-placeholder"></div>
-                  )}
-                  <div className="workout-mobile-play-button">
-                    <div className="workout-mobile-play-icon">▶</div>
-                  </div>
+                  <video
+                    src={videoSource}
+                    className="workout-mobile-video"
+                    controls
+                    playsInline
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                   <div className="workout-mobile-duration-badge">
-                    <span>Watch</span>
+                    <span>{formData.video ? 'Ready' : 'Watch'}</span>
                   </div>
                 </div>
                 <div className="workout-mobile-card-body">
@@ -75,10 +65,10 @@ export default function WorkoutMobilePreview({ formData }) {
             </div>
           )}
 
-          {!formData.videoUrl && (
+          {!hasVideo && (
             <div className="workout-mobile-empty">
               <div className="workout-mobile-empty-text">
-                Enter video URL to see preview
+                Select a video to see preview
               </div>
             </div>
           )}

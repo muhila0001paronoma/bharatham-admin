@@ -10,9 +10,10 @@ import './Theory.css';
 
 export default function Theory() {
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [theoryTopics, setTheoryTopics] = useState([]);
-  const [theoryDetails, setTheoryDetails] = useState(theoryData.details);
+  const [theoryDetails, setTheoryDetails] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTheoryData, setSelectedTheoryData] = useState(null);
@@ -29,12 +30,20 @@ export default function Theory() {
     fetchTopics();
   }, []);
 
-  const getAuthHeaders = () => {
+  // Fetch theory details when topics are loaded or on mount
+  useEffect(() => {
+    fetchAllTheoryDetails();
+  }, [theoryTopics]);
+
+  const getAuthHeaders = (isMultipart = false) => {
     const token = localStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
+    const headers = {
       'Authorization': `Bearer ${token}`
     };
+    if (!isMultipart) {
+      headers['Content-Type'] = 'application/json';
+    }
+    return headers;
   };
 
   const fetchTopics = async () => {
@@ -46,9 +55,6 @@ export default function Theory() {
       const result = await response.json();
       if (result.success) {
         setTheoryTopics(result.data);
-        if (result.data.length > 0 && !selectedTopic) {
-          setSelectedTopic(result.data[0].topicName);
-        }
       }
     } catch (error) {
       console.error('Error fetching topics:', error);
@@ -57,15 +63,50 @@ export default function Theory() {
     }
   };
 
+  const fetchAllTheoryDetails = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/details`, {
+        headers: getAuthHeaders()
+      });
+      const result = await response.json();
+      if (result.success) {
+        setTheoryDetails(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching all theory details:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchTheoryDetailsByTopic = async (topicId) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/topics/${topicId}/details`, {
+        headers: getAuthHeaders()
+      });
+      const result = await response.json();
+      if (result.success) {
+        setTheoryDetails(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching theory details:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredData = theoryDetails.filter(item => {
-    if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    return (
-      item.topic.toLowerCase().includes(query) ||
-      item.subTopic.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.notes.toLowerCase().includes(query)
-    );
+    const matchesSearch = !searchQuery ||
+      (item.subTopicName || '').toLowerCase().includes(query) ||
+      (item.description || '').toLowerCase().includes(query) ||
+      (item.notes || '').toLowerCase().includes(query);
+
+    const matchesTopic = !selectedTopicId || item.topicId === selectedTopicId;
+
+    return matchesSearch && matchesTopic;
   });
 
   const columns = [
@@ -77,35 +118,15 @@ export default function Theory() {
       render: (value, row, index) => index + 1
     },
     {
-      key: 'images',
-      label: 'IMAGES',
+      key: 'imageUrl',
+      label: 'IMAGE',
       sortable: false,
       width: '120px',
       render: (value, row) => (
         <div className="theory-table-images">
-          {row.imgUrl1 && (
+          {value && (
             <img
-              src={row.imgUrl1}
-              alt="Theory"
-              className="theory-table-image"
-              onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/40x40?text=Image';
-              }}
-            />
-          )}
-          {row.imgUrl2 && (
-            <img
-              src={row.imgUrl2}
-              alt="Theory"
-              className="theory-table-image"
-              onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/40x40?text=Image';
-              }}
-            />
-          )}
-          {row.imgUrl3 && (
-            <img
-              src={row.imgUrl3}
+              src={value}
               alt="Theory"
               className="theory-table-image"
               onError={(e) => {
@@ -117,16 +138,20 @@ export default function Theory() {
       )
     },
     {
-      key: 'topic',
+      key: 'topicId',
       label: 'TOPIC',
       sortable: true,
-      width: '120px'
+      width: '150px',
+      render: (value) => {
+        const topic = theoryTopics.find(t => t.topicId === value);
+        return topic ? topic.topicName : 'N/A';
+      }
     },
     {
-      key: 'subTopic',
+      key: 'subTopicName',
       label: 'SUB TOPIC',
       sortable: true,
-      width: '120px'
+      width: '150px'
     },
     {
       key: 'description',
@@ -141,12 +166,12 @@ export default function Theory() {
       width: '300px',
       render: (value) => (
         <div className="theory-table-notes" title={value}>
-          {value.length > 100 ? `${value.substring(0, 100)}...` : value}
+          {value && value.length > 100 ? `${value.substring(0, 100)}...` : value}
         </div>
       )
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       width: '100px',
@@ -217,25 +242,47 @@ export default function Theory() {
     setIsModalOpen(true);
   };
 
-  const handleSaveTheory = (formData) => {
-    if (selectedTheoryData) {
-      setTheoryDetails(prev =>
-        prev.map(item =>
-          item.id === selectedTheoryData.id
-            ? { ...item, ...formData }
-            : item
-        )
-      );
-    } else {
-      const newTheory = {
-        id: theoryDetails.length + 1,
-        index: theoryDetails.length + 1,
-        ...formData
-      };
-      setTheoryDetails(prev => [...prev, newTheory]);
+  const handleSaveTheory = async (formData) => {
+    setIsLoading(true);
+    try {
+      const isUpdate = !!selectedTheoryData;
+      const url = isUpdate
+        ? `${import.meta.env.VITE_API_URL}/theory/details/${selectedTheoryData.detailId}`
+        : `${import.meta.env.VITE_API_URL}/theory/details`;
+
+      const method = isUpdate ? 'PUT' : 'POST';
+
+      const data = new FormData();
+      data.append('topicId', formData.topicId);
+      data.append('subTopicName', formData.subTopicName);
+      data.append('description', formData.description);
+      data.append('notes', formData.notes || '');
+
+      if (formData.file) {
+        data.append('image', formData.file);
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: getAuthHeaders(true),
+        body: data,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchAllTheoryDetails();
+        setIsModalOpen(false);
+        setSelectedTheoryData(null);
+      } else {
+        alert(result.message || 'Failed to save theory detail');
+      }
+    } catch (error) {
+      console.error('Error saving theory detail:', error);
+      alert('An error occurred while saving the theory detail');
+    } finally {
+      setIsLoading(false);
     }
-    setIsModalOpen(false);
-    setSelectedTheoryData(null);
   };
 
   const handleCloseModal = () => {
@@ -248,12 +295,30 @@ export default function Theory() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (itemToDelete) {
-      setTheoryDetails(prev => prev.filter(item => item.id !== itemToDelete.id));
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/theory/details/${itemToDelete.detailId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchAllTheoryDetails();
+      } else {
+        alert(result.message || 'Failed to delete theory detail');
+      }
+    } catch (error) {
+      console.error('Error deleting theory detail:', error);
+      alert('An error occurred while deleting the theory detail');
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
       setItemToDelete(null);
     }
-    setIsDeleteModalOpen(false);
   };
 
   const handleDeleteTopic = (e, topic) => {
@@ -275,6 +340,11 @@ export default function Theory() {
 
       if (result.success) {
         await fetchTopics();
+        if (selectedTopicId === topicToDelete.topicId) {
+          setSelectedTopic(null);
+          setSelectedTopicId(null);
+          setTheoryDetails([]);
+        }
       } else {
         alert(result.message || 'Failed to delete topic');
       }
@@ -303,7 +373,7 @@ export default function Theory() {
   };
   const totalTopics = theoryTopics.length;
   const totalDetails = theoryDetails.length;
-  const activeDetails = theoryDetails.filter(item => item.active).length;
+  const activeDetails = theoryDetails.filter(item => item.isActive).length;
 
   return (
     <div className="theory-page">
@@ -362,11 +432,23 @@ export default function Theory() {
           </button>
         </div>
         <div className="theory-topics-container">
+          <div
+            className={`theory-topic-tag ${!selectedTopicId ? 'theory-topic-tag-active' : ''}`}
+            onClick={() => {
+              setSelectedTopic(null);
+              setSelectedTopicId(null);
+            }}
+          >
+            <span>All Topics</span>
+          </div>
           {theoryTopics.filter(t => t.isActive).map((topic) => (
             <div
               key={topic.topicId}
-              className={`theory-topic-tag ${selectedTopic === topic.topicName ? 'theory-topic-tag-active' : ''}`}
-              onClick={() => setSelectedTopic(topic.topicName)}
+              className={`theory-topic-tag ${selectedTopicId === topic.topicId ? 'theory-topic-tag-active' : ''}`}
+              onClick={() => {
+                setSelectedTopic(topic.topicName);
+                setSelectedTopicId(topic.topicId);
+              }}
             >
               <span>{topic.topicName}</span>
               <div className="theory-topic-tag-actions">
@@ -389,7 +471,9 @@ export default function Theory() {
 
       <div className="theory-section">
         <div className="theory-section-header">
-          <h2 className="theory-section-title">Theory Details</h2>
+          <h2 className="theory-section-title">
+            All Theory Details
+          </h2>
           <button
             onClick={handleAddTheoryDetail}
             className="theory-button theory-button-primary"
@@ -411,7 +495,7 @@ export default function Theory() {
               <Search className="theory-search-icon" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search details..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="theory-search-input"
@@ -455,7 +539,7 @@ export default function Theory() {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         title="Delete Theory Detail"
-        message={`Are you sure you want to delete "${itemToDelete?.subTopic || 'this theory detail'}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${itemToDelete?.subTopicName || 'this theory detail'}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         type="danger"
@@ -476,3 +560,4 @@ export default function Theory() {
     </div>
   );
 }
+
