@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Video } from 'lucide-react';
 import { Input } from '../ui/input';
 import WorkoutMobilePreview from './WorkoutMobilePreview';
 import './WorkoutModal.css';
 
-export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData = null, tabs = [] }) {
+export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData = null, tabs = [], isLoading = false }) {
   const [formData, setFormData] = useState({
-    workoutTab: '',
+    workoutTabId: '',
+    video: null,
     videoUrl: '',
     title: '',
     description: ''
   });
+  const [videoPreview, setVideoPreview] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -27,27 +29,37 @@ export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData =
   useEffect(() => {
     if (videoData) {
       setFormData({
-        workoutTab: videoData.workoutTab || '',
+        workoutTabId: videoData.workoutTabId || '',
+        video: null,
         videoUrl: videoData.videoUrl || '',
         title: videoData.title || '',
         description: videoData.description || ''
       });
+      setVideoPreview(videoData.videoUrl ? 'Existing Video' : '');
     } else {
       setFormData({
-        workoutTab: '',
+        workoutTabId: '',
+        video: null,
         videoUrl: '',
         title: '',
         description: ''
       });
+      setVideoPreview('');
     }
   }, [videoData, isOpen]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value, files } = e.target;
+    if (name === 'video') {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, video: file }));
+      setVideoPreview(file ? file.name : '');
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -77,35 +89,45 @@ export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData =
                   Workout Tab
                 </label>
                 <select
-                  id="workoutTab"
-                  name="workoutTab"
-                  value={formData.workoutTab}
+                  id="workoutTabId"
+                  name="workoutTabId"
+                  value={formData.workoutTabId}
                   onChange={handleChange}
                   className="workout-form-select"
                   required
                 >
                   <option value="">Select a workout tab</option>
                   {tabs.map((tab) => (
-                    <option key={tab} value={tab}>
-                      {tab}
+                    <option key={tab.id} value={tab.id}>
+                      {tab.tabName}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="workout-form-group">
-                <label htmlFor="videoUrl" className="workout-form-label">
-                  Video URL
+                <label htmlFor="video" className="workout-form-label">
+                  Workout Video
                 </label>
-                <Input
-                  id="videoUrl"
-                  name="videoUrl"
-                  type="url"
-                  value={formData.videoUrl}
-                  onChange={handleChange}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  required
-                />
+                <div className="workout-file-input-wrapper">
+                  <input
+                    id="video"
+                    name="video"
+                    type="file"
+                    accept="video/mp4"
+                    onChange={handleChange}
+                    className="workout-file-input"
+                    required={!videoData}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="video" className="workout-file-label">
+                    <div className="workout-file-info">
+                      <Video size={18} />
+                      <span>{videoPreview || 'Select Video (.mp4)'}</span>
+                    </div>
+                    <div className="workout-file-button">Browse</div>
+                  </label>
+                </div>
               </div>
 
               <div className="workout-form-group">
@@ -143,8 +165,12 @@ export default function WorkoutVideoModal({ isOpen, onClose, onSave, videoData =
                 <button type="button" className="workout-form-cancel-btn" onClick={onClose}>
                   Cancel
                 </button>
-                <button type="submit" className="workout-form-submit-btn">
-                  {videoData ? 'Update' : 'Add'} Workout Video
+                <button
+                  type="submit"
+                  className="workout-form-submit-btn"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : (videoData ? 'Update' : 'Add')} Workout Video
                 </button>
               </div>
             </form>

@@ -104,7 +104,7 @@ export default function TopicModal({ isOpen, onClose, onSave, topicData = null, 
             </div>
             <TopicMobilePreview
               formData={formData}
-              existingTopics={topicData ? existingTopics.filter(t => t.topicId !== topicData.topicId) : existingTopics}
+              existingTopics={(topicData ? existingTopics.filter(t => t.topicId !== topicData.topicId) : existingTopics).filter(t => t.isActive)}
             />
           </div>
         </div>

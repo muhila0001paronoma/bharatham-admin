@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, Edit2, Dumbbell, FileText, TrendingUp, Users, Trash2 } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import WorkoutVideoModal from '../components/workout/WorkoutVideoModal';
 import WorkoutTabModal from '../components/workout/WorkoutTabModal';
@@ -10,8 +11,9 @@ import './Workouts.css';
 export default function Workouts() {
   const [selectedTab, setSelectedTab] = useState('Fitness');
   const [searchQuery, setSearchQuery] = useState('');
-  const [workoutTabs, setWorkoutTabs] = useState(workoutsData.tabs);
-  const [workoutVideos, setWorkoutVideos] = useState(workoutsData.videos);
+  const [tabSearchQuery, setTabSearchQuery] = useState('');
+  const [workoutTabs, setWorkoutTabs] = useState([]);
+  const [workoutVideos, setWorkoutVideos] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVideoData, setSelectedVideoData] = useState(null);
@@ -20,22 +22,79 @@ export default function Workouts() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleteType, setDeleteType] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredData = workoutVideos.filter(item => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      item.videoUrl.toLowerCase().includes(query) ||
-      item.workoutTab.toLowerCase().includes(query) ||
-      item.title.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query)
-    );
+  React.useEffect(() => {
+    fetchTabs();
+    fetchVideos();
+  }, []);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchVideos(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
+  const fetchTabs = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/workout/tabs`, {
+        headers: getAuthHeaders()
+      });
+      const result = await response.json();
+      if (result.success) {
+        setWorkoutTabs(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching workout tabs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchVideos = async (searchQuery = '') => {
+    setIsLoading(true);
+    try {
+      const url = searchQuery
+        ? `${import.meta.env.VITE_API_URL}/workout/videos/search?title=${searchQuery}`
+        : `${import.meta.env.VITE_API_URL}/workout/videos`;
+
+      const response = await fetch(url, {
+        headers: getAuthHeaders()
+      });
+      const result = await response.json();
+      if (result.success) {
+        setWorkoutVideos(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching workout videos:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredTabs = workoutTabs.filter(tab => {
+    if (!tabSearchQuery) return true;
+    const query = tabSearchQuery.toLowerCase();
+    return tab.tabName.toLowerCase().includes(query);
   });
+
+  const filteredData = workoutVideos; // Already filtered by API or fetchVideos
 
   const tabColumns = [
     {
       key: 'id',
       label: '#',
+      align: 'center',
       sortable: true,
       width: '60px',
       render: (value, row, index) => index + 1
@@ -47,15 +106,19 @@ export default function Workouts() {
       width: '200px'
     },
     {
-      key: 'iconName',
-      label: 'ICON NAME',
-      sortable: true,
-      width: '150px',
-      render: (value) => (
-        <div className="workout-table-icon" title={value}>
-          {value || '●'}
-        </div>
-      )
+      key: 'tabIcon',
+      label: 'ICON',
+      align: 'center',
+      sortable: false,
+      width: '100px',
+      render: (value) => {
+        const Icon = LucideIcons[value] || LucideIcons.Dumbbell;
+        return (
+          <div className="workout-table-icon" title={value}>
+            <Icon size={20} />
+          </div>
+        );
+      }
     },
     {
       key: 'actions',
@@ -87,6 +150,7 @@ export default function Workouts() {
     {
       key: 'id',
       label: '#',
+      align: 'center',
       sortable: true,
       width: '60px',
       render: (value, row, index) => index + 1
@@ -97,16 +161,21 @@ export default function Workouts() {
       sortable: true,
       width: '250px',
       render: (value) => (
-        <div className="workout-table-url" title={value}>
+        <div
+          className="workout-table-url"
+          title={value}
+          onClick={() => window.open(value, '_blank')}
+        >
           {value.length > 40 ? `${value.substring(0, 40)}...` : value}
         </div>
       )
     },
     {
-      key: 'workoutTab',
+      key: 'workoutTabId',
       label: 'WORKOUT TAB',
       sortable: true,
-      width: '120px'
+      width: '120px',
+      render: (value) => workoutTabs.find(t => t.id === value)?.tabName || 'Unknown'
     },
     {
       key: 'title',
@@ -126,8 +195,9 @@ export default function Workouts() {
       )
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
+      align: 'center',
       sortable: true,
       width: '100px',
       render: (value) => (
@@ -148,25 +218,37 @@ export default function Workouts() {
     setIsTabModalOpen(true);
   };
 
-  const handleSaveTab = (formData) => {
-    const tabObject = {
-      tabName: formData.tabName,
-      iconName: formData.iconName
-    };
-    
-    if (selectedTabData) {
-      const selectedTabName = typeof selectedTabData === 'string' ? selectedTabData : selectedTabData.tabName;
-      setWorkoutTabs(prev => 
-        prev.map(tab => {
-          const tabName = typeof tab === 'string' ? tab : tab.tabName;
-          return tabName === selectedTabName ? tabObject : tab;
-        })
-      );
-    } else {
-      setWorkoutTabs(prev => [tabObject, ...prev]);
+  const handleSaveTab = async (formData) => {
+    setIsLoading(true);
+    try {
+      const isEdit = !!selectedTabData;
+      const url = isEdit
+        ? `${import.meta.env.VITE_API_URL}/workout/tabs/${selectedTabData.id}`
+        : `${import.meta.env.VITE_API_URL}/workout/tabs`;
+
+      const response = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          tabName: formData.tabName,
+          tabIcon: formData.tabIcon
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        await fetchTabs();
+        setIsTabModalOpen(false);
+        setSelectedTabData(null);
+      } else {
+        alert(result.message || 'Failed to save workout tab');
+      }
+    } catch (error) {
+      console.error('Error saving workout tab:', error);
+      alert('An error occurred while saving the workout tab');
+    } finally {
+      setIsLoading(false);
     }
-    setIsTabModalOpen(false);
-    setSelectedTabData(null);
   };
 
   const handleCloseTabModal = () => {
@@ -184,25 +266,45 @@ export default function Workouts() {
     setIsModalOpen(true);
   };
 
-  const handleSaveVideo = (formData) => {
-    if (selectedVideoData) {
-      setWorkoutVideos(prev => 
-        prev.map(item => 
-          item.id === selectedVideoData.id 
-            ? { ...item, ...formData, active: true }
-            : item
-        )
-      );
-    } else {
-      const newVideo = {
-        id: workoutVideos.length + 1,
-        ...formData,
-        active: true
-      };
-      setWorkoutVideos(prev => [...prev, newVideo]);
+  const handleSaveVideo = async (formData) => {
+    setIsLoading(true);
+    try {
+      const isEdit = !!selectedVideoData;
+      const url = isEdit
+        ? `${import.meta.env.VITE_API_URL}/workout/videos/${selectedVideoData.id}`
+        : `${import.meta.env.VITE_API_URL}/workout/videos`;
+
+      const data = new FormData();
+      data.append('workoutTabId', formData.workoutTabId);
+      data.append('title', formData.title);
+      data.append('description', formData.description);
+      if (formData.video) {
+        data.append('video', formData.video);
+      }
+
+      const headers = { ...getAuthHeaders() };
+      delete headers['Content-Type']; // Let browser set boundary for multipart/form-data
+
+      const response = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: headers,
+        body: data,
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        await fetchVideos();
+        setIsModalOpen(false);
+        setSelectedVideoData(null);
+      } else {
+        alert(result.message || 'Failed to save workout video');
+      }
+    } catch (error) {
+      console.error('Error saving workout video:', error);
+      alert('An error occurred while saving the workout video');
+    } finally {
+      setIsLoading(false);
     }
-    setIsModalOpen(false);
-    setSelectedVideoData(null);
   };
 
   const handleCloseModal = () => {
@@ -222,17 +324,40 @@ export default function Workouts() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (itemToDelete) {
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    setIsLoading(true);
+    try {
       if (deleteType === 'tab') {
-        const tabName = typeof itemToDelete === 'string' ? itemToDelete : itemToDelete.tabName;
-        setWorkoutTabs(prev => prev.filter(tab => {
-          const currentTabName = typeof tab === 'string' ? tab : tab.tabName;
-          return currentTabName !== tabName;
-        }));
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/workout/tabs/${itemToDelete.id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+        const result = await response.json();
+        if (result.success) {
+          await fetchTabs();
+        } else {
+          alert(result.message || 'Failed to delete workout tab');
+        }
       } else {
-        setWorkoutVideos(prev => prev.filter(item => item.id !== itemToDelete.id));
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/workout/videos/${itemToDelete.id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+        const result = await response.json();
+        if (result.success) {
+          await fetchVideos();
+        } else {
+          alert(result.message || 'Failed to delete workout video');
+        }
       }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      alert('An error occurred while deleting');
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
       setItemToDelete(null);
       setDeleteType(null);
     }
@@ -250,7 +375,7 @@ export default function Workouts() {
 
   const totalTabs = workoutTabs.length;
   const totalVideos = workoutVideos.length;
-  const activeVideos = workoutVideos.filter(item => item.active).length;
+  const activeVideos = workoutVideos.filter(item => item.isActive).length;
 
   return (
     <div className="workout-page">
@@ -260,7 +385,7 @@ export default function Workouts() {
             <div className="workout-page-header-icon">
               <Dumbbell size={28} />
             </div>
-    <div>
+            <div>
               <h1 className="workout-page-header-title">Workout Management</h1>
               <p className="workout-page-header-subtitle">Manage workout tabs and videos for the Bharatham app</p>
             </div>
@@ -308,17 +433,27 @@ export default function Workouts() {
             Create Workout Tab
           </button>
         </div>
+        <div className="workout-videos-toolbar">
+          <div className="workout-search-filter">
+            <div className="workout-search-input-wrapper">
+              <Search className="workout-search-icon" />
+              <input
+                type="text"
+                placeholder="Search tabs..."
+                value={tabSearchQuery}
+                onChange={(e) => setTabSearchQuery(e.target.value)}
+                className="workout-search-input"
+              />
+            </div>
+          </div>
+        </div>
         <div className="workout-table-container">
           <DataTable
-            data={workoutTabs.map((tab, index) => ({
-              id: index + 1,
-              tabName: typeof tab === 'string' ? tab : tab.tabName,
-              iconName: typeof tab === 'string' ? '●' : (tab.iconName || '●'),
-              ...(typeof tab === 'object' ? tab : {})
-            }))}
+            data={filteredTabs}
             columns={tabColumns}
             pageSize={pageSize}
             onPageSizeChange={setPageSize}
+            isLoading={isLoading}
           />
         </div>
       </div>
@@ -364,6 +499,7 @@ export default function Workouts() {
             selectable={true}
             pageSize={pageSize}
             onPageSizeChange={setPageSize}
+            isLoading={isLoading}
           />
         </div>
       </div>
@@ -374,6 +510,7 @@ export default function Workouts() {
         onSave={handleSaveVideo}
         videoData={selectedVideoData}
         tabs={workoutTabs}
+        isLoading={isLoading}
       />
 
       <WorkoutTabModal
@@ -382,6 +519,7 @@ export default function Workouts() {
         onSave={handleSaveTab}
         tabData={selectedTabData}
         existingTabs={workoutTabs}
+        isLoading={isLoading}
       />
 
       <ConfirmationModal
@@ -389,7 +527,7 @@ export default function Workouts() {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         title={deleteType === 'tab' ? 'Delete Workout Tab' : 'Delete Workout Video'}
-        message={deleteType === 'tab' 
+        message={deleteType === 'tab'
           ? `Are you sure you want to delete "${typeof itemToDelete === 'string' ? itemToDelete : itemToDelete?.tabName || 'this workout tab'}"? This action cannot be undone.`
           : `Are you sure you want to delete "${itemToDelete?.title || 'this workout video'}"? This action cannot be undone.`}
         confirmText="Delete"

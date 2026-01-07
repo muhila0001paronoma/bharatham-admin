@@ -1,13 +1,14 @@
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import './WorkoutTabMobilePreview.css';
 
 export default function WorkoutTabMobilePreview({ formData, existingTabs = [] }) {
-  const newTab = formData.tabName ? { tabName: formData.tabName, iconName: formData.iconName || '●' } : null;
+  const newTab = formData.tabName ? { tabName: formData.tabName, tabIcon: formData.tabIcon || 'Dumbbell' } : null;
   const allTabs = newTab
     ? [newTab, ...existingTabs.filter(t => {
-        const existingTabName = typeof t === 'string' ? t : t.tabName;
-        return existingTabName !== formData.tabName;
-      })]
+      const existingTabName = typeof t === 'string' ? t : t.tabName;
+      return existingTabName !== formData.tabName;
+    })]
     : existingTabs;
 
   const getTabName = (tab) => {
@@ -15,17 +16,9 @@ export default function WorkoutTabMobilePreview({ formData, existingTabs = [] })
   };
 
   const getTabIcon = (tab) => {
-    if (typeof tab === 'string') {
-      const iconMap = {
-        'Fitness': '💪',
-        'Mobility': '🧘',
-        'Strength': '🏋️',
-        'Flexibility': '🤸',
-        'Cardio': '🏃'
-      };
-      return iconMap[tab] || '●';
-    }
-    return tab.iconName || '●';
+    const iconName = typeof tab === 'string' ? 'Dumbbell' : (tab.tabIcon || 'Dumbbell');
+    const IconComponent = LucideIcons[iconName] || LucideIcons.Dumbbell;
+    return <IconComponent size={24} />;
   };
 
   return (
@@ -51,8 +44,8 @@ export default function WorkoutTabMobilePreview({ formData, existingTabs = [] })
                 const tabName = getTabName(tab);
                 const isNew = tabName === formData.tabName;
                 return (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className={`workout-tab-preview-card ${isNew ? 'workout-tab-preview-card-new' : ''}`}
                   >
                     <div className="workout-tab-preview-card-content">

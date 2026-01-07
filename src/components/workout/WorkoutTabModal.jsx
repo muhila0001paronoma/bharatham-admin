@@ -1,14 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { Input } from '../ui/input';
 import WorkoutTabMobilePreview from './WorkoutTabMobilePreview';
 import './WorkoutModal.css';
 
-export default function WorkoutTabModal({ isOpen, onClose, onSave, tabData = null, existingTabs = [] }) {
+const RECOMMENDED_ICONS = [
+  'Dumbbell', 'StretchHorizontal', 'Timer', 'Heart', 'Zap', 'Flame',
+  'Activity', 'Watch', 'Play', 'TrendingUp', 'Map', 'Target',
+  'Moon', 'Sun', 'User', 'Users', 'Bike', 'Footprints', 'Trophy', 'Medal'
+];
+
+// Dynamically get all icons from LucideIcons
+const ALL_LUCIDE_ICONS_LIST = Object.entries(LucideIcons)
+  .filter(([name, component]) =>
+    typeof component === 'object' &&
+    name.charAt(0) === name.charAt(0).toUpperCase() &&
+    !['X', 'Check', 'Chevron'].some(exclude => name.startsWith(exclude))
+  )
+  .map(([name, component]) => ({ name, icon: component }));
+
+export default function WorkoutTabModal({ isOpen, onClose, onSave, tabData = null, existingTabs = [], isLoading = false }) {
   const [formData, setFormData] = useState({
     tabName: '',
-    iconName: ''
+    tabIcon: 'Dumbbell'
   });
+  const [iconSearch, setIconSearch] = useState('');
+  const [viewAll, setViewAll] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -25,13 +43,13 @@ export default function WorkoutTabModal({ isOpen, onClose, onSave, tabData = nul
   useEffect(() => {
     if (tabData) {
       setFormData({
-        tabName: tabData.tabName || (typeof tabData === 'string' ? tabData : ''),
-        iconName: tabData.iconName || ''
+        tabName: tabData.tabName || '',
+        tabIcon: tabData.tabIcon || 'Dumbbell'
       });
     } else {
       setFormData({
         tabName: '',
-        iconName: ''
+        tabIcon: 'Dumbbell'
       });
     }
   }, [tabData, isOpen]);
@@ -82,26 +100,61 @@ export default function WorkoutTabModal({ isOpen, onClose, onSave, tabData = nul
               </div>
 
               <div className="workout-form-group">
-                <label htmlFor="iconName" className="workout-form-label">
-                  Icon Name
+                <label className="workout-form-label">
+                  Select Icon
                 </label>
-                <Input
-                  id="iconName"
-                  name="iconName"
-                  type="text"
-                  value={formData.iconName}
-                  onChange={handleChange}
-                  placeholder="Enter icon (e.g., 💪, 🧘, 🏋️)"
-                  required
-                />
+                <div className="workout-icon-picker">
+                  <div className="workout-icon-picker-toolbar">
+                    <div className="workout-icon-search-wrapper">
+                      <LucideIcons.Search size={14} className="workout-icon-search-icon" />
+                      <input
+                        type="text"
+                        placeholder="Search all icons..."
+                        value={iconSearch}
+                        onChange={(e) => setIconSearch(e.target.value)}
+                        className="workout-icon-search-input"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className={`workout-icon-toggle-btn ${viewAll ? 'active' : ''}`}
+                      onClick={() => setViewAll(!viewAll)}
+                    >
+                      {viewAll ? 'Show Recommended' : 'View All'}
+                    </button>
+                  </div>
+                  <div className="workout-icon-grid">
+                    {ALL_LUCIDE_ICONS_LIST.filter(item => {
+                      const matchesSearch = item.name.toLowerCase().includes(iconSearch.toLowerCase());
+                      const isRecommended = RECOMMENDED_ICONS.includes(item.name);
+                      return matchesSearch && (viewAll || isRecommended || iconSearch.length > 0);
+                    }).map((item) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <div
+                          key={item.name}
+                          className={`workout-icon-item ${formData.tabIcon === item.name ? 'workout-icon-item-active' : ''}`}
+                          onClick={() => setFormData(prev => ({ ...prev, tabIcon: item.name }))}
+                          title={item.name}
+                        >
+                          <IconComponent size={20} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               <div className="workout-form-actions">
                 <button type="button" className="workout-form-cancel-btn" onClick={onClose}>
                   Cancel
                 </button>
-                <button type="submit" className="workout-form-submit-btn">
-                  {tabData ? 'Update' : 'Create'} Tab
+                <button
+                  type="submit"
+                  className="workout-form-submit-btn"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : (tabData ? 'Update' : 'Create')} Tab
                 </button>
               </div>
             </form>
@@ -111,8 +164,8 @@ export default function WorkoutTabModal({ isOpen, onClose, onSave, tabData = nul
             <div className="workout-preview-header">
               <h3 className="workout-preview-title">Mobile Preview</h3>
             </div>
-            <WorkoutTabMobilePreview 
-              formData={formData} 
+            <WorkoutTabMobilePreview
+              formData={formData}
               existingTabs={existingTabs}
             />
           </div>
