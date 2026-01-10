@@ -1,21 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, Book, Calendar } from 'lucide-react';
 import EnrollmentMobilePreview from './EnrollmentMobilePreview';
+import { courseService } from '../../services/courseService';
 import './EnrollmentModal.css';
 
 const EnrollmentModal = ({ isOpen, onClose, onSave, enrollmentData }) => {
     const [formData, setFormData] = useState({
+        courseId: '',
         courseTitle: '',
         userEmail: '',
         enrolledAt: '',
         active: true
     });
 
+    const [courses, setCourses] = useState([]);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await courseService.getAll();
+                if (response.success) {
+                    setCourses(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
     useEffect(() => {
         if (enrollmentData) {
             setFormData(enrollmentData);
         } else {
             setFormData({
+                courseId: '',
                 courseTitle: '',
                 userEmail: '',
                 enrolledAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
@@ -26,10 +46,20 @@ const EnrollmentModal = ({ isOpen, onClose, onSave, enrollmentData }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+
+        if (name === 'courseId') {
+            const selectedCourse = courses.find(c => c.id === value);
+            setFormData(prev => ({
+                ...prev,
+                courseId: value,
+                courseTitle: selectedCourse ? selectedCourse.courseTitle : ''
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -55,17 +85,22 @@ const EnrollmentModal = ({ isOpen, onClose, onSave, enrollmentData }) => {
                     <div className="enrollment-modal-form-section">
                         <form onSubmit={handleSubmit} className="enrollment-modal-form" id="enrollmentForm">
                             <div className="enrollment-modal-field">
-                                <label>Course Title</label>
+                                <label>Course</label>
                                 <div className="enrollment-input-with-icon">
                                     <Book size={18} className="enrollment-input-icon" />
-                                    <input
-                                        type="text"
-                                        name="courseTitle"
-                                        value={formData.courseTitle}
+                                    <select
+                                        name="courseId"
+                                        value={formData.courseId}
                                         onChange={handleChange}
-                                        placeholder="e.g. Beginner Bharatanatyam Basics"
                                         required
-                                    />
+                                    >
+                                        <option value="">Select a Course</option>
+                                        {courses.map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.courseTitle}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

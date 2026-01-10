@@ -1,64 +1,100 @@
 import React, { useState } from 'react';
 import { Search, Filter, CreditCard, DollarSign, TrendingUp } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
+import PaymentModal from '../../components/courses/PaymentModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { paymentService } from '../../services/paymentService';
+import { Trash2, Edit } from 'lucide-react';
 import './UserPayments.css';
 
 const UserPayments = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [pageSize, setPageSize] = useState(10);
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      amount: '10,000',
-      status: 'PAID',
-      type: 'Advance',
-      paidAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 2,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      amount: '10,000',
-      status: 'PAID',
-      type: 'Advance',
-      paidAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 3,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      amount: '10,000',
-      status: 'PAID',
-      type: 'Advance',
-      paidAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 4,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      amount: '10,000',
-      status: 'PAID',
-      type: 'Advance',
-      paidAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 5,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      amount: '10,000',
-      status: 'PAID',
-      type: 'Advance',
-      paidAt: '2026-03-16 00:00:00',
-      active: true
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [paymentToDelete, setPaymentToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [rows, setRows] = useState([]);
+
+  const fetchPayments = async () => {
+    try {
+      setLoading(true);
+      const response = await paymentService.getAll();
+      if (response.success) {
+        // Map backend fields to frontend fields
+        const mappedPayments = response.data.map(payment => ({
+          ...payment,
+          active: payment.isActive
+        }));
+        setRows(mappedPayments);
+      } else {
+        setError(response.message || 'Failed to fetch payments');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching payments');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  React.useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const handleEdit = (payment) => {
+    setSelectedPayment(payment);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (payment) => {
+    setPaymentToDelete(payment);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (paymentToDelete) {
+      try {
+        const response = await paymentService.delete(paymentToDelete.id);
+        if (response.success) {
+          setRows(prev => prev.filter(p => p.id !== paymentToDelete.id));
+          setIsDeleteModalOpen(false);
+          setPaymentToDelete(null);
+        } else {
+          alert(response.message || 'Failed to delete payment');
+        }
+      } catch (err) {
+        console.error('Error deleting payment:', err);
+        alert('An error occurred while deleting the payment');
+      }
+    }
+  };
+
+  const handleSavePayment = async (formData) => {
+    try {
+      let response;
+      if (selectedPayment) {
+        response = await paymentService.update(selectedPayment.id, formData);
+      } else {
+        response = await paymentService.create(formData);
+      }
+
+      if (response.success) {
+        fetchPayments();
+        setIsModalOpen(false);
+        setSelectedPayment(null);
+      } else {
+        alert(response.message || 'Failed to save payment');
+      }
+    } catch (err) {
+      console.error('Error saving payment:', err);
+      alert('An error occurred while saving the payment');
+    }
+  };
 
 
 
@@ -120,16 +156,35 @@ const UserPayments = () => {
       key: 'active',
       label: 'ACTIVE',
       sortable: true,
+      width: '100px',
       render: (value) => (
         <span className={`theory-status ${value ? 'theory-status-active' : 'theory-status-inactive'}`}>
           {value ? 'Active' : 'Inactive'}
         </span>
       )
     },
+    {
+      key: 'actions',
+      label: 'ACTIONS',
+      width: '120px',
+      render: (_, row) => (
+        <div className="payment-action-buttons">
+          <button className="payment-edit-btn" onClick={() => handleEdit(row)}>
+            <Edit size={18} />
+          </button>
+          <button className="payment-delete-btn" onClick={() => handleDeleteClick(row)}>
+            <Trash2 size={18} />
+          </button>
+        </div>
+      )
+    }
   ];
 
   const totalPaymentsCount = rows.length;
-  const totalAmount = rows.reduce((acc, curr) => acc + parseFloat(curr.amount.replace(',', '')), 0);
+  const totalAmount = rows.reduce((acc, curr) => {
+    const amt = curr.amount?.toString().replace(/,/g, '') || '0';
+    return acc + parseFloat(amt);
+  }, 0);
 
   return (
     <div className="payments-page">
@@ -201,7 +256,24 @@ const UserPayments = () => {
         </div>
       </div>
 
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSavePayment}
+        paymentData={selectedPayment}
+      />
 
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Payment Record"
+        message={`Are you sure you want to delete this payment record for "${paymentToDelete?.userEmail}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        icon={Trash2}
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Search, Filter, Plus, Edit, Trash2, BookOpen, Clock, Users, TrendingUp 
 import DataTable from '../../components/ui/DataTable';
 import CourseModal from '../../components/courses/CourseModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { courseService } from '../../services/courseService';
 import './CourseDetails.css';
 
 const CourseDetails = () => {
@@ -12,87 +13,39 @@ const CourseDetails = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseToDelete, setCourseToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
-    },
-    {
-      id: 2,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
-    },
-    {
-      id: 3,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
-    },
-    {
-      id: 4,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
-    },
-    {
-      id: 5,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
-    },
-    {
-      id: 6,
-      title: 'Beginner Bharatanatyam Basics',
-      about: 'Learn foundational Bharatanatyam movements and rhythms',
-      duration: '12 weeks',
-      level: 'Beginner',
-      price: '24,500',
-      status: 'Upcoming',
-      teacherName: 'Sita Raman',
-      startDate: '2025-12-04',
-      endDate: '2026-03-16',
-      active: true
+  const [rows, setRows] = useState([]);
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const response = await courseService.getAll();
+      if (response.success) {
+        // Map backend fields to frontend fields
+        const mappedCourses = response.data.map(course => ({
+          ...course,
+          title: course.courseTitle,
+          about: course.aboutCourse,
+          duration: course.courseDuration,
+          active: course.isActive
+        }));
+        setRows(mappedCourses);
+      } else {
+        setError(response.message || 'Failed to fetch courses');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching courses');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  React.useEffect(() => {
+    fetchCourses();
+  }, []);
 
   const handleAddCourse = () => {
     setSelectedCourse(null);
@@ -109,26 +62,44 @@ const CourseDetails = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (courseToDelete) {
-      setRows(prev => prev.filter(c => c.id !== courseToDelete.id));
-      setIsDeleteModalOpen(false);
-      setCourseToDelete(null);
+      try {
+        const response = await courseService.delete(courseToDelete.id);
+        if (response.success) {
+          setRows(prev => prev.filter(c => c.id !== courseToDelete.id));
+          setIsDeleteModalOpen(false);
+          setCourseToDelete(null);
+        } else {
+          alert(response.message || 'Failed to delete course');
+        }
+      } catch (err) {
+        console.error('Error deleting course:', err);
+        alert('An error occurred while deleting the course');
+      }
     }
   };
 
-  const handleSaveCourse = (formData) => {
-    if (selectedCourse) {
-      setRows(prev => prev.map(c => c.id === selectedCourse.id ? { ...formData, id: c.id } : c));
-    } else {
-      const newCourse = {
-        ...formData,
-        id: rows.length > 0 ? Math.max(...rows.map(c => c.id)) + 1 : 1
-      };
-      setRows(prev => [...prev, newCourse]);
+  const handleSaveCourse = async (formData) => {
+    try {
+      let response;
+      if (selectedCourse) {
+        response = await courseService.update(selectedCourse.id, formData);
+      } else {
+        response = await courseService.create(formData);
+      }
+
+      if (response.success) {
+        fetchCourses();
+        setIsModalOpen(false);
+        setSelectedCourse(null);
+      } else {
+        alert(response.message || 'Failed to save course');
+      }
+    } catch (err) {
+      console.error('Error saving course:', err);
+      alert('An error occurred while saving the course');
     }
-    setIsModalOpen(false);
-    setSelectedCourse(null);
   };
 
   const filteredData = rows.filter(item => {

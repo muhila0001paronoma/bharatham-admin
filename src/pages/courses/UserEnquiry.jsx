@@ -16,6 +16,7 @@ import { Search, Filter, Edit, Trash2, HelpCircle, MessageSquare, CheckCircle } 
 import DataTable from '../../components/ui/DataTable';
 import EnquiryModal from '../../components/courses/EnquiryModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { enquiryService } from '../../services/enquiryService';
 import './UserEnquiry.css';
 
 const UserEnquiry = () => {
@@ -25,69 +26,36 @@ const UserEnquiry = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [enquiryToDelete, setEnquiryToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'Hi, I would like to know the exact timings for the weekend batches.',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 2,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi03@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'Is there a discount for bulk enrollment?',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 3,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'What is the duration of each session?',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 4,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'Can I get a trial class before paying?',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 5,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'I want to know about the intermediate level transition.',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 6,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      subject: 'Tell me about this course schedule and pricing',
-      message: 'What certification will I get at the end?',
-      reply: '',
-      enquiredAt: '2026-03-16 00:00:00',
-      active: true
+  const [rows, setRows] = useState([]);
+
+  const fetchEnquiries = async () => {
+    try {
+      setLoading(true);
+      const response = await enquiryService.getAll();
+      if (response.success) {
+        // Map backend fields to frontend fields
+        const mappedEnquiries = response.data.map(enquiry => ({
+          ...enquiry,
+          active: enquiry.isActive
+        }));
+        setRows(mappedEnquiries);
+      } else {
+        setError(response.message || 'Failed to fetch enquiries');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching enquiries');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  React.useEffect(() => {
+    fetchEnquiries();
+  }, []);
 
   const handleEdit = (enquiry) => {
     setSelectedEnquiry(enquiry);
@@ -99,26 +67,44 @@ const UserEnquiry = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (enquiryToDelete) {
-      setRows(prev => prev.filter(e => e.id !== enquiryToDelete.id));
-      setIsDeleteModalOpen(false);
-      setEnquiryToDelete(null);
+      try {
+        const response = await enquiryService.delete(enquiryToDelete.id);
+        if (response.success) {
+          setRows(prev => prev.filter(e => e.id !== enquiryToDelete.id));
+          setIsDeleteModalOpen(false);
+          setEnquiryToDelete(null);
+        } else {
+          alert(response.message || 'Failed to delete enquiry');
+        }
+      } catch (err) {
+        console.error('Error deleting enquiry:', err);
+        alert('An error occurred while deleting the enquiry');
+      }
     }
   };
 
-  const handleSaveEnquiry = (formData) => {
-    if (selectedEnquiry) {
-      setRows(prev => prev.map(e => e.id === selectedEnquiry.id ? { ...formData, id: e.id } : e));
-    } else {
-      const newEnquiry = {
-        ...formData,
-        id: rows.length > 0 ? Math.max(...rows.map(e => e.id)) + 1 : 1
-      };
-      setRows(prev => [...prev, newEnquiry]);
+  const handleSaveEnquiry = async (formData) => {
+    try {
+      let response;
+      if (selectedEnquiry) {
+        response = await enquiryService.update(selectedEnquiry.id, formData);
+      } else {
+        response = await enquiryService.create(formData);
+      }
+
+      if (response.success) {
+        fetchEnquiries();
+        setIsModalOpen(false);
+        setSelectedEnquiry(null);
+      } else {
+        alert(response.message || 'Failed to save enquiry');
+      }
+    } catch (err) {
+      console.error('Error saving enquiry:', err);
+      alert('An error occurred while saving the enquiry');
     }
-    setIsModalOpen(false);
-    setSelectedEnquiry(null);
   };
 
   const filteredData = rows.filter(item => {
