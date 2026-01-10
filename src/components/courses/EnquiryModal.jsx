@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, Book, Tag, MessageSquare, Reply } from 'lucide-react';
 import EnquiryMobilePreview from './EnquiryMobilePreview';
+import { courseService } from '../../services/courseService';
 import './EnquiryModal.css';
 
 const EnquiryModal = ({ isOpen, onClose, onSave, enquiryData }) => {
     const [formData, setFormData] = useState({
+        courseId: '',
         courseTitle: '',
         userEmail: '',
         subject: '',
@@ -14,11 +16,29 @@ const EnquiryModal = ({ isOpen, onClose, onSave, enquiryData }) => {
         active: true
     });
 
+    const [courses, setCourses] = useState([]);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await courseService.getAll();
+                if (response.success) {
+                    setCourses(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
     useEffect(() => {
         if (enquiryData) {
             setFormData(enquiryData);
         } else {
             setFormData({
+                courseId: '',
                 courseTitle: '',
                 userEmail: '',
                 subject: '',
@@ -32,10 +52,20 @@ const EnquiryModal = ({ isOpen, onClose, onSave, enquiryData }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+
+        if (name === 'courseId') {
+            const selectedCourse = courses.find(c => c.id === value);
+            setFormData(prev => ({
+                ...prev,
+                courseId: value,
+                courseTitle: selectedCourse ? selectedCourse.courseTitle : ''
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -62,17 +92,22 @@ const EnquiryModal = ({ isOpen, onClose, onSave, enquiryData }) => {
                         <form onSubmit={handleSubmit} className="enquiry-modal-form" id="enquiryForm">
                             <div className="enquiry-modal-row">
                                 <div className="enquiry-modal-field">
-                                    <label>Course Title</label>
+                                    <label>Course</label>
                                     <div className="enquiry-input-with-icon">
                                         <Book size={18} className="enquiry-input-icon" />
-                                        <input
-                                            type="text"
-                                            name="courseTitle"
-                                            value={formData.courseTitle}
+                                        <select
+                                            name="courseId"
+                                            value={formData.courseId}
                                             onChange={handleChange}
-                                            placeholder="e.g. Beginner Bharatanatyam Basics"
                                             required
-                                        />
+                                        >
+                                            <option value="">Select a Course</option>
+                                            {courses.map(course => (
+                                                <option key={course.id} value={course.id}>
+                                                    {course.courseTitle}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="enquiry-modal-field">

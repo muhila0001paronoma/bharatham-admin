@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Edit, Trash2, Plus, Video, Film, CheckCircle } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import ChoreographyVideoModal from '../../components/teachers/ChoreographyVideoModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { choreographyVideoService } from '../../services/choreographyVideoService';
+import { teacherService } from '../../services/teacherService';
 import './ChoreographyVideos.css';
 
 const ChoreographyVideos = () => {
@@ -12,76 +14,58 @@ const ChoreographyVideos = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoToDelete, setVideoToDelete] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [teachers, setTeachers] = useState({});
 
-  // Mock data as seen in the image
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    },
-    {
-      id: 2,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    },
-    {
-      id: 3,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    },
-    {
-      id: 4,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    },
-    {
-      id: 5,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    },
-    {
-      id: 6,
-      videoUrl: 'https://example.com/videos/adavus-basic.mp4',
-      thumbnailUrl: 'https://example.com/thumbnails/adavus-basic.jpg',
-      title: 'Adavus - Basic Steps',
-      teacherName: 'Sita Raman',
-      description: 'Learn the fundamental adavus (basic steps) of Bharatanatyam',
-      level: 'Beginner',
-      duration: '14 minutes',
-      active: true
-    }
-  ]);
+  // Helper function to get teacher name from ID
+  const getTeacherName = (teacherId) => {
+    return teachers[teacherId]?.name || teacherId;
+  };
+
+  // Helper function to format duration
+  const formatDuration = (seconds) => {
+    if (!seconds) return '0 minutes';
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  };
+
+  // Load videos and teachers
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch both videos and teachers
+        const [videosResponse, teachersResponse] = await Promise.all([
+          choreographyVideoService.getAll(),
+          teacherService.getAll()
+        ]);
+
+        // Create teacher lookup map
+        if (teachersResponse.success && teachersResponse.data) {
+          const teacherMap = {};
+          teachersResponse.data.forEach(teacher => {
+            teacherMap[teacher.id] = teacher;
+          });
+          setTeachers(teacherMap);
+        }
+
+        // Set videos
+        if (videosResponse.success && videosResponse.data) {
+          setRows(videosResponse.data);
+        }
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load videos. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const handleAddVideo = () => {
     setSelectedVideo(null);
@@ -98,37 +82,72 @@ const ChoreographyVideos = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (videoToDelete) {
-      setRows(prev => prev.filter(v => v.id !== videoToDelete.id));
-      setIsDeleteModalOpen(false);
-      setVideoToDelete(null);
+  const handleConfirmDelete = async () => {
+    if (!videoToDelete) return;
+
+    try {
+      setLoading(true);
+      const response = await choreographyVideoService.delete(videoToDelete.id);
+
+      if (response.success) {
+        // Reload videos
+        const videosResponse = await choreographyVideoService.getAll();
+        if (videosResponse.success && videosResponse.data) {
+          setRows(videosResponse.data);
+        }
+        setIsDeleteModalOpen(false);
+        setVideoToDelete(null);
+      } else {
+        setError(response.message || 'Failed to delete video');
+      }
+    } catch (err) {
+      console.error('Error deleting video:', err);
+      setError('Failed to delete video. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSaveVideo = (formData) => {
-    if (selectedVideo) {
-      // Update existing
-      setRows(prev => prev.map(v => v.id === selectedVideo.id ? { ...formData, id: v.id } : v));
-    } else {
-      // Add new
-      const newVideo = {
-        ...formData,
-        id: rows.length > 0 ? Math.max(...rows.map(v => v.id)) + 1 : 1
-      };
-      setRows(prev => [...prev, newVideo]);
+  const handleSaveVideo = async (formData) => {
+    try {
+      setLoading(true);
+      let response;
+
+      if (selectedVideo) {
+        // Update existing
+        response = await choreographyVideoService.update(selectedVideo.id, formData);
+      } else {
+        // Add new
+        response = await choreographyVideoService.create(formData);
+      }
+
+      if (response.success) {
+        // Reload videos
+        const videosResponse = await choreographyVideoService.getAll();
+        if (videosResponse.success && videosResponse.data) {
+          setRows(videosResponse.data);
+        }
+        setIsModalOpen(false);
+        setSelectedVideo(null);
+      } else {
+        setError(response.message || 'Failed to save video');
+      }
+    } catch (err) {
+      console.error('Error saving video:', err);
+      setError('Failed to save video. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setIsModalOpen(false);
-    setSelectedVideo(null);
   };
 
   const filteredData = rows.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
+    const teacherName = getTeacherName(item.teacherId);
     return (
       item.title.toLowerCase().includes(query) ||
-      item.teacherName.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query)
+      teacherName.toLowerCase().includes(query) ||
+      (item.description && item.description.toLowerCase().includes(query))
     );
   });
 
@@ -158,9 +177,10 @@ const ChoreographyVideos = () => {
       sortable: true,
     },
     {
-      key: 'teacherName',
+      key: 'teacherId',
       label: 'TEACHER NAME',
       sortable: true,
+      render: (value) => getTeacherName(value)
     },
     {
       key: 'description',
@@ -177,9 +197,10 @@ const ChoreographyVideos = () => {
       key: 'duration',
       label: 'DURATION',
       sortable: true,
+      render: (value) => formatDuration(value)
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       render: (value) => (
@@ -205,7 +226,7 @@ const ChoreographyVideos = () => {
   ];
 
   const totalVideos = rows.length;
-  const activeVideos = rows.filter(r => r.active).length;
+  const activeVideos = rows.filter(r => r.isActive).length;
 
   return (
     <div className="choreography-page">
@@ -269,15 +290,20 @@ const ChoreographyVideos = () => {
           </div>
         </div>
 
-        <div className="theory-table-container">
-          <DataTable
-            columns={columns}
-            data={filteredData}
-            selectable={true}
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-          />
-        </div>
+        {loading && <div className="quiz-loading">Loading videos...</div>}
+        {error && <div className="quiz-error">{error}</div>}
+
+        {!loading && !error && (
+          <div className="theory-table-container">
+            <DataTable
+              columns={columns}
+              data={filteredData}
+              selectable={true}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
+          </div>
+        )}
       </div>
 
       <ChoreographyVideoModal
@@ -285,6 +311,8 @@ const ChoreographyVideos = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveVideo}
         videoData={selectedVideo}
+        teachers={Object.values(teachers)}
+        loading={loading}
       />
 
       <ConfirmationModal

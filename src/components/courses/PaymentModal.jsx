@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { X, DollarSign, Mail, Book, Calendar, CreditCard } from 'lucide-react';
 import PaymentMobilePreview from './PaymentMobilePreview';
+import { courseService } from '../../services/courseService';
 import './PaymentModal.css';
 
 const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
     const [formData, setFormData] = useState({
+        courseId: '',
         courseTitle: '',
         userEmail: '',
         amount: '',
@@ -14,11 +16,29 @@ const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
         active: true
     });
 
+    const [courses, setCourses] = useState([]);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await courseService.getAll();
+                if (response.success) {
+                    setCourses(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
     useEffect(() => {
         if (paymentData) {
             setFormData(paymentData);
         } else {
             setFormData({
+                courseId: '',
                 courseTitle: '',
                 userEmail: '',
                 amount: '',
@@ -32,10 +52,20 @@ const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+
+        if (name === 'courseId') {
+            const selectedCourse = courses.find(c => c.id === value);
+            setFormData(prev => ({
+                ...prev,
+                courseId: value,
+                courseTitle: selectedCourse ? selectedCourse.courseTitle : ''
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -50,7 +80,7 @@ const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
             <div className="payment-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="payment-modal-header">
                     <h3 className="payment-modal-title">
-                        Edit Payment Record
+                        {paymentData ? 'Edit Payment Record' : 'Add New Payment'}
                     </h3>
                     <button className="payment-modal-close" onClick={onClose}>
                         <X size={20} />
@@ -61,17 +91,22 @@ const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
                     <div className="payment-modal-form-section">
                         <form onSubmit={handleSubmit} className="payment-modal-form" id="paymentForm">
                             <div className="payment-modal-field">
-                                <label>Course Title</label>
+                                <label>Course</label>
                                 <div className="payment-input-with-icon">
                                     <Book size={18} className="payment-input-icon" />
-                                    <input
-                                        type="text"
-                                        name="courseTitle"
-                                        value={formData.courseTitle}
+                                    <select
+                                        name="courseId"
+                                        value={formData.courseId}
                                         onChange={handleChange}
-                                        placeholder="e.g. Beginner Bharatanatyam Basics"
                                         required
-                                    />
+                                    >
+                                        <option value="">Select a Course</option>
+                                        {courses.map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.courseTitle}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -170,7 +205,7 @@ const PaymentModal = ({ isOpen, onClose, onSave, paymentData }) => {
                         Cancel
                     </button>
                     <button type="submit" form="paymentForm" className="payment-modal-btn save">
-                        Update Payment
+                        {paymentData ? 'Update Payment' : 'Save Payment'}
                     </button>
                 </div>
             </div>

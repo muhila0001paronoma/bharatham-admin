@@ -53,6 +53,10 @@ export default function CourseMobilePreview({ formData }) {
                                     <span>{formData.duration || '12 weeks'}</span>
                                 </div>
                                 <div className="course-mobile-meta-item">
+                                    <Award size={12} />
+                                    <span>{formData.totalLessons || '0'} Lessons</span>
+                                </div>
+                                <div className="course-mobile-meta-item">
                                     <Star size={12} fill="#fbbf24" color="#fbbf24" />
                                     <span>4.8 (120)</span>
                                 </div>

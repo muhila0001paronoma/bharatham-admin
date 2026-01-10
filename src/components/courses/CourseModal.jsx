@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Calendar, DollarSign, BookOpen, Clock } from 'lucide-react';
+import { X, Upload, Calendar, DollarSign, BookOpen, Clock, Users } from 'lucide-react';
 import CourseMobilePreview from './CourseMobilePreview';
+import { teacherService } from '../../services/teacherService';
 import './CourseModal.css';
 
 const CourseModal = ({ isOpen, onClose, onSave, courseData }) => {
@@ -11,12 +12,32 @@ const CourseModal = ({ isOpen, onClose, onSave, courseData }) => {
         level: 'Beginner',
         price: '',
         status: 'Upcoming',
+        teacherId: '',
         teacherName: '',
         startDate: '',
         endDate: '',
+        totalLessons: '',
+        totalEnrolledStudents: '',
         active: true,
         image: ''
     });
+
+    const [teachers, setTeachers] = useState([]);
+
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const response = await teacherService.getAll();
+                if (response.success) {
+                    setTeachers(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+            }
+        };
+
+        fetchTeachers();
+    }, []);
 
     useEffect(() => {
         if (courseData) {
@@ -29,9 +50,12 @@ const CourseModal = ({ isOpen, onClose, onSave, courseData }) => {
                 level: 'Beginner',
                 price: '',
                 status: 'Upcoming',
+                teacherId: '',
                 teacherName: '',
                 startDate: '',
                 endDate: '',
+                totalLessons: '',
+                totalEnrolledStudents: '',
                 active: true,
                 image: ''
             });
@@ -40,10 +64,20 @@ const CourseModal = ({ isOpen, onClose, onSave, courseData }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+
+        if (name === 'teacherId') {
+            const selectedTeacher = teachers.find(t => t.id === value);
+            setFormData(prev => ({
+                ...prev,
+                teacherId: value,
+                teacherName: selectedTeacher ? selectedTeacher.name : ''
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -84,15 +118,51 @@ const CourseModal = ({ isOpen, onClose, onSave, courseData }) => {
                                     </div>
                                 </div>
                                 <div className="course-modal-field">
-                                    <label>Teacher Name</label>
-                                    <input
-                                        type="text"
-                                        name="teacherName"
-                                        value={formData.teacherName}
+                                    <label>Teacher</label>
+                                    <select
+                                        name="teacherId"
+                                        value={formData.teacherId}
                                         onChange={handleChange}
-                                        placeholder="e.g. Sita Raman"
                                         required
-                                    />
+                                    >
+                                        <option value="">Select a Teacher</option>
+                                        {teachers.map(teacher => (
+                                            <option key={teacher.id} value={teacher.id}>
+                                                {teacher.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="course-modal-row">
+                                <div className="course-modal-field">
+                                    <label>Total Lessons</label>
+                                    <div className="input-with-icon">
+                                        <BookOpen size={18} className="input-icon" />
+                                        <input
+                                            type="number"
+                                            name="totalLessons"
+                                            value={formData.totalLessons}
+                                            onChange={handleChange}
+                                            placeholder="e.g. 24"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="course-modal-field">
+                                    <label>Total Enrolled Students</label>
+                                    <div className="input-with-icon">
+                                        <Users size={18} className="input-icon" />
+                                        <input
+                                            type="number"
+                                            name="totalEnrolledStudents"
+                                            value={formData.totalEnrolledStudents}
+                                            onChange={handleChange}
+                                            placeholder="e.g. 0"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
 

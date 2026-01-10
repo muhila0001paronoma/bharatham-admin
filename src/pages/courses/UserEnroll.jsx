@@ -3,6 +3,7 @@ import { Search, Filter, Edit, Trash2, UserCheck, Users, Calendar } from 'lucide
 import DataTable from '../../components/ui/DataTable';
 import EnrollmentModal from '../../components/courses/EnrollmentModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { enrollmentService } from '../../services/enrollmentService';
 import './UserEnroll.css';
 
 const UserEnroll = () => {
@@ -12,44 +13,36 @@ const UserEnroll = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
   const [enrollmentToDelete, setEnrollmentToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      enrolledAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 2,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      enrolledAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 3,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      enrolledAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 4,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      enrolledAt: '2026-03-16 00:00:00',
-      active: true
-    },
-    {
-      id: 5,
-      courseTitle: 'Beginner Bharatanatyam Basics',
-      userEmail: 'bavi003@gmail.com',
-      enrolledAt: '2026-03-16 00:00:00',
-      active: true
+  const [rows, setRows] = useState([]);
+
+  const fetchEnrollments = async () => {
+    try {
+      setLoading(true);
+      const response = await enrollmentService.getAll();
+      if (response.success) {
+        // Map backend fields to frontend fields
+        const mappedEnrollments = response.data.map(enrollment => ({
+          ...enrollment,
+          active: enrollment.isActive
+        }));
+        setRows(mappedEnrollments);
+      } else {
+        setError(response.message || 'Failed to fetch enrollments');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching enrollments');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  React.useEffect(() => {
+    fetchEnrollments();
+  }, []);
 
   const handleEdit = (enrollment) => {
     setSelectedEnrollment(enrollment);
@@ -61,26 +54,44 @@ const UserEnroll = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (enrollmentToDelete) {
-      setRows(prev => prev.filter(r => r.id !== enrollmentToDelete.id));
-      setIsDeleteModalOpen(false);
-      setEnrollmentToDelete(null);
+      try {
+        const response = await enrollmentService.delete(enrollmentToDelete.id);
+        if (response.success) {
+          setRows(prev => prev.filter(r => r.id !== enrollmentToDelete.id));
+          setIsDeleteModalOpen(false);
+          setEnrollmentToDelete(null);
+        } else {
+          alert(response.message || 'Failed to delete enrollment');
+        }
+      } catch (err) {
+        console.error('Error deleting enrollment:', err);
+        alert('An error occurred while deleting the enrollment');
+      }
     }
   };
 
-  const handleSaveEnrollment = (formData) => {
-    if (selectedEnrollment) {
-      setRows(prev => prev.map(r => r.id === selectedEnrollment.id ? { ...formData, id: r.id } : r));
-    } else {
-      const newEnrollment = {
-        ...formData,
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1
-      };
-      setRows(prev => [...prev, newEnrollment]);
+  const handleSaveEnrollment = async (formData) => {
+    try {
+      let response;
+      if (selectedEnrollment) {
+        response = await enrollmentService.update(selectedEnrollment.id, formData);
+      } else {
+        response = await enrollmentService.create(formData);
+      }
+
+      if (response.success) {
+        fetchEnrollments();
+        setIsModalOpen(false);
+        setSelectedEnrollment(null);
+      } else {
+        alert(response.message || 'Failed to save enrollment');
+      }
+    } catch (err) {
+      console.error('Error saving enrollment:', err);
+      alert('An error occurred while saving the enrollment');
     }
-    setIsModalOpen(false);
-    setSelectedEnrollment(null);
   };
 
   const filteredData = rows.filter(item => {
