@@ -8,13 +8,13 @@ import './ReelModal.css';
 
 export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) {
   const [formData, setFormData] = useState({
-    videoUrl: '',
-    title: '',
+    reelUrl: '',
+    reelTitle: '',
     uploadedBy: '',
     uploadedAt: '',
-    likes: 0,
-    shares: 0,
-    active: true
+    likeCount: 0,
+    shareCount: 0,
+    isActive: true
   });
   const [videoFile, setVideoFile] = useState(null);
 
@@ -33,26 +33,26 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
   useEffect(() => {
     if (reelData) {
       setFormData({
-        videoUrl: reelData.videoUrl || '',
-        title: reelData.title || '',
+        reelUrl: reelData.reelUrl || '',
+        reelTitle: reelData.reelTitle || '',
         uploadedBy: reelData.uploadedBy || '',
         uploadedAt: reelData.uploadedAt || '',
-        likes: reelData.likes || 0,
-        shares: reelData.shares || 0,
-        active: reelData.active !== undefined ? reelData.active : true
+        likeCount: reelData.likeCount || 0,
+        shareCount: reelData.shareCount || 0,
+        isActive: reelData.isActive !== undefined ? reelData.isActive : true
       });
       setVideoFile(null);
     } else {
       const now = new Date();
       const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
       setFormData({
-        videoUrl: sampleReelVideo,
-        title: '',
+        reelUrl: '', // Removed sampleReelVideo dependency for new reels
+        reelTitle: '',
         uploadedBy: '',
         uploadedAt: formattedDate,
-        likes: 0,
-        shares: 0,
-        active: true
+        likeCount: 0,
+        shareCount: 0,
+        isActive: true
       });
       setVideoFile(null);
     }
@@ -74,7 +74,7 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
       reader.onloadend = () => {
         setFormData(prev => ({
           ...prev,
-          videoUrl: reader.result
+          reelUrl: reader.result
         }));
       };
       reader.readAsDataURL(file);
@@ -118,10 +118,10 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                     className="reel-form-file-input"
                     required={!reelData}
                   />
-                  {formData.videoUrl && (
+                  {formData.reelUrl && (
                     <div className="reel-form-video-preview">
                       <video
-                        src={formData.videoUrl}
+                        src={formData.reelUrl}
                         className="reel-form-video-preview-element"
                         controls
                         muted
@@ -132,7 +132,7 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                           className="reel-form-video-remove"
                           onClick={() => {
                             setVideoFile(null);
-                            setFormData(prev => ({ ...prev, videoUrl: '' }));
+                            setFormData(prev => ({ ...prev, reelUrl: '' }));
                           }}
                         >
                           Remove
@@ -148,10 +148,10 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                   Title
                 </label>
                 <Input
-                  id="title"
-                  name="title"
+                  id="reelTitle"
+                  name="reelTitle"
                   type="text"
-                  value={formData.title}
+                  value={formData.reelTitle}
                   onChange={handleChange}
                   placeholder="Enter reel title"
                   required
@@ -177,14 +177,15 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                 <label htmlFor="uploadedAt" className="reel-form-label">
                   Uploaded At
                 </label>
-                <Input
+                <input
                   id="uploadedAt"
                   name="uploadedAt"
                   type="datetime-local"
-                  value={formData.uploadedAt ? formData.uploadedAt.replace(' ', 'T').slice(0, 16) : ''}
+                  className="w-full p-2 border rounded"
+                  value={formData.uploadedAt ? new Date(formData.uploadedAt).toISOString().slice(0, 16) : ''}
                   onChange={(e) => {
-                    const value = e.target.value.replace('T', ' ') + ':00';
-                    setFormData(prev => ({ ...prev, uploadedAt: value }));
+                    const date = new Date(e.target.value);
+                    setFormData(prev => ({ ...prev, uploadedAt: date.toISOString() }));
                   }}
                   required
                 />
@@ -195,10 +196,10 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                   Likes
                 </label>
                 <Input
-                  id="likes"
-                  name="likes"
+                  id="likeCount"
+                  name="likeCount"
                   type="number"
-                  value={formData.likes}
+                  value={formData.likeCount}
                   onChange={handleChange}
                   placeholder="0"
                   min="0"
@@ -211,10 +212,10 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                   Shares
                 </label>
                 <Input
-                  id="shares"
-                  name="shares"
+                  id="shareCount"
+                  name="shareCount"
                   type="number"
-                  value={formData.shares}
+                  value={formData.shareCount}
                   onChange={handleChange}
                   placeholder="0"
                   min="0"
@@ -226,8 +227,8 @@ export default function ReelModal({ isOpen, onClose, onSave, reelData = null }) 
                 <label className="reel-form-checkbox-label">
                   <input
                     type="checkbox"
-                    name="active"
-                    checked={formData.active}
+                    name="isActive"
+                    checked={formData.isActive}
                     onChange={handleChange}
                     className="reel-form-checkbox"
                   />

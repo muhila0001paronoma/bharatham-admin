@@ -22,6 +22,11 @@ export const courseService = {
         }
     },
 
+    // Alias for getAllCourses to support existing components
+    getAllCourses: async function () {
+        return this.getAll();
+    },
+
     // Get course by ID
     getById: async (id) => {
         try {

@@ -1,29 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Trophy, FileText, TrendingUp, Users, Trash2 } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import ChallengeModal from '../components/challenge/ChallengeModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { challengesData } from '../data/data';
+import { challengeService } from '../services/challengeService';
 import './Challenges.css';
 
 export default function Challenges() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [challenges, setChallenges] = useState(challengesData.challenges);
+  const [challenges, setChallenges] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedChallengeData, setSelectedChallengeData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const filteredData = challenges.filter(item => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      item.challengeName.toLowerCase().includes(query) ||
-      item.shortDescription.toLowerCase().includes(query) ||
-      item.explanation.toLowerCase().includes(query)
-    );
-  });
+  useEffect(() => {
+    fetchChallenges();
+  }, []);
+
+  const fetchChallenges = async () => {
+    setIsLoading(true);
+    try {
+      const response = await challengeService.getAllChallenges();
+      if (response.success) {
+        setChallenges(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching challenges:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch();
+      } else {
+        fetchChallenges();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleSearch = async () => {
+    try {
+      const response = await challengeService.searchChallenges(searchQuery);
+      if (response.success) {
+        setChallenges(response.data);
+      }
+    } catch (error) {
+      console.error('Error searching challenges:', error);
+    }
+  };
+
+  const filteredData = challenges;
 
   const columns = [
     {
@@ -69,8 +105,8 @@ export default function Challenges() {
       width: '180px'
     },
     {
-      key: 'duration',
-      label: 'DURATION',
+      key: 'timeDuration',
+      label: 'DURATION (MIN)',
       sortable: true,
       width: '120px'
     },
@@ -81,7 +117,7 @@ export default function Challenges() {
       width: '100px'
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       width: '100px',
@@ -103,24 +139,26 @@ export default function Challenges() {
     setIsModalOpen(true);
   };
 
-  const handleSaveChallenge = (formData) => {
-    if (selectedChallengeData) {
-      setChallenges(prev => 
-        prev.map(item => 
-          item.id === selectedChallengeData.id 
-            ? { ...item, ...formData }
-            : item
-        )
-      );
-    } else {
-      const newChallenge = {
-        id: challenges.length + 1,
-        ...formData
-      };
-      setChallenges(prev => [...prev, newChallenge]);
+  const handleSaveChallenge = async (formData) => {
+    setIsSaving(true);
+    try {
+      let response;
+      if (selectedChallengeData) {
+        response = await challengeService.updateChallenge(selectedChallengeData.id, formData);
+      } else {
+        response = await challengeService.createChallenge(formData);
+      }
+
+      if (response.success) {
+        await fetchChallenges();
+        setIsModalOpen(false);
+        setSelectedChallengeData(null);
+      }
+    } catch (error) {
+      console.error('Error saving challenge:', error);
+    } finally {
+      setIsSaving(false);
     }
-    setIsModalOpen(false);
-    setSelectedChallengeData(null);
   };
 
   const handleCloseModal = () => {
@@ -133,9 +171,17 @@ export default function Challenges() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      setChallenges(prev => prev.filter(item => item.id !== itemToDelete.id));
+      try {
+        const response = await challengeService.deleteChallenge(itemToDelete.id);
+        if (response.success) {
+          setChallenges(prev => prev.filter(item => item.id !== itemToDelete.id));
+        }
+      } catch (error) {
+        console.error('Error deleting challenge:', error);
+      }
+      setIsDeleteModalOpen(false);
       setItemToDelete(null);
     }
   };
@@ -150,7 +196,7 @@ export default function Challenges() {
   };
 
   const totalChallenges = challenges.length;
-  const activeChallenges = challenges.filter(item => item.active).length;
+  const activeChallenges = challenges.filter(item => item.isActive).length;
 
   return (
     <div className="challenge-page">
@@ -238,6 +284,7 @@ export default function Challenges() {
         onClose={handleCloseModal}
         onSave={handleSaveChallenge}
         challengeData={selectedChallengeData}
+        isLoading={isSaving}
       />
 
       <ConfirmationModal

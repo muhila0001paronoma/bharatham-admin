@@ -63,6 +63,13 @@ export default function OnlineEventModal({ isOpen, onClose, onSave, eventData = 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Store file for upload
+      setFormData(prev => ({
+        ...prev,
+        imageFile: file
+      }));
+
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({
@@ -79,7 +86,8 @@ export default function OnlineEventModal({ isOpen, onClose, onSave, eventData = 
     const submitData = {
       ...formData,
       eventDateTime: formData.eventDateTime ? formData.eventDateTime.replace('T', ' ') + ':00' : '',
-      totalAmount: parseInt(formData.totalAmount) || 0
+      totalAmount: parseInt(formData.totalAmount) || 0,
+      imageFile: formData.imageFile
     };
     onSave(submitData);
   };
