@@ -1,19 +1,44 @@
-import React, { useState } from 'react';
-import { Search, Filter, Plus, Calendar, FileText, TrendingUp, Users, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Plus, Calendar, FileText, TrendingUp, Users, Trash2, Eye } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import OnlineEventModal from '../components/onlineevent/OnlineEventModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { onlineEventsData } from '../data/data';
+import EventBookingsModal from '../components/onlineevent/EventBookingsModal';
+import { onlineEventService } from '../services/onlineEventService';
 import './OnlineEvents.css';
 
 export default function OnlineEvents() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [events, setEvents] = useState(onlineEventsData.events);
+  const [events, setEvents] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEventData, setSelectedEventData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Bookings State
+  const [isBookingsModalOpen, setIsBookingsModalOpen] = useState(false);
+  const [currentBookings, setCurrentBookings] = useState([]);
+  const [selectedEventForBookings, setSelectedEventForBookings] = useState(null);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    try {
+      const response = await onlineEventService.getAllEvents();
+      if (response && response.data) {
+        setEvents(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch events", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredData = events.filter(item => {
     if (!searchQuery) return true;
@@ -27,6 +52,41 @@ export default function OnlineEvents() {
 
   const formatAmount = (amount) => {
     return `₹${amount.toLocaleString('en-IN')}`;
+  };
+
+  const handleViewBookings = async (event) => {
+    setSelectedEventForBookings(event);
+    try {
+      const response = await onlineEventService.getBookingsByEventId(event.id);
+      if (response && response.data) {
+        setCurrentBookings(response.data);
+      } else {
+        setCurrentBookings([]);
+      }
+      setIsBookingsModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch bookings", error);
+      // alert("Could not fetch bookings"); // Optional error handling
+    }
+  };
+
+  const handleDeleteBooking = async (booking) => {
+    if (window.confirm("Are you sure you want to delete this booking?")) {
+      try {
+        await onlineEventService.deleteBooking(booking.id);
+        // Refresh bookings list
+        if (selectedEventForBookings) {
+          const response = await onlineEventService.getBookingsByEventId(selectedEventForBookings.id);
+          if (response && response.data) {
+            setCurrentBookings(response.data);
+          } else {
+            setCurrentBookings([]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to delete booking", error);
+      }
+    }
   };
 
   const columns = [
@@ -69,7 +129,8 @@ export default function OnlineEvents() {
       key: 'eventDateTime',
       label: 'DATE TIME',
       sortable: true,
-      width: '180px'
+      width: '180px',
+      render: (value) => value ? new Date(value).toLocaleString() : '-'
     },
     {
       key: 'description',
@@ -78,7 +139,7 @@ export default function OnlineEvents() {
       width: '250px',
       render: (value) => (
         <div className="event-table-description" title={value}>
-          {value.length > 50 ? `${value.substring(0, 50)}...` : value}
+          {value && value.length > 50 ? `${value.substring(0, 50)}...` : value}
         </div>
       )
     },
@@ -105,6 +166,25 @@ export default function OnlineEvents() {
           {value ? 'Active' : 'Inactive'}
         </span>
       )
+    },
+    {
+      key: 'bookings',
+      label: 'BOOKINGS',
+      width: '100px',
+      align: 'center',
+      render: (_, row) => (
+        <button
+          className="data-table-action-button"
+          style={{ color: '#007bff' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewBookings(row);
+          }}
+          title="View Bookings"
+        >
+          <Eye size={18} />
+        </button>
+      )
     }
   ];
 
@@ -118,24 +198,20 @@ export default function OnlineEvents() {
     setIsModalOpen(true);
   };
 
-  const handleSaveEvent = (formData) => {
-    if (selectedEventData) {
-      setEvents(prev => 
-        prev.map(item => 
-          item.id === selectedEventData.id 
-            ? { ...item, ...formData }
-            : item
-        )
-      );
-    } else {
-      const newEvent = {
-        id: events.length + 1,
-        ...formData
-      };
-      setEvents(prev => [...prev, newEvent]);
+  const handleSaveEvent = async (formData) => {
+    try {
+      if (selectedEventData) {
+        await onlineEventService.updateEvent(selectedEventData.id, formData);
+      } else {
+        await onlineEventService.createEvent(formData);
+      }
+      setIsModalOpen(false);
+      setSelectedEventData(null);
+      fetchEvents();
+    } catch (error) {
+      console.error("Failed to save event", error);
+      alert("Failed to save event. Please try again.");
     }
-    setIsModalOpen(false);
-    setSelectedEventData(null);
   };
 
   const handleCloseModal = () => {
@@ -148,10 +224,17 @@ export default function OnlineEvents() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      setEvents(prev => prev.filter(item => item.id !== itemToDelete.id));
-      setItemToDelete(null);
+      try {
+        await onlineEventService.deleteEvent(itemToDelete.id);
+        fetchEvents();
+        setItemToDelete(null);
+        setIsDeleteModalOpen(false);
+      } catch (error) {
+        console.error("Failed to delete event", error);
+        alert("Failed to delete event.");
+      }
     }
   };
 
@@ -162,10 +245,11 @@ export default function OnlineEvents() {
 
   const handleFilter = () => {
     console.log('Filter');
+    // Future implementation: Open filter modal or toggle filter row
   };
 
   const totalEvents = events.length;
-  const activeEvents = events.filter(item => item.active).length;
+  const activeEvents = events.filter(item => item.isActive || item.active).length; // Handle both key naming conventions if API differs
 
   return (
     <div className="event-page">
@@ -236,15 +320,19 @@ export default function OnlineEvents() {
           </div>
         </div>
         <div className="event-table-container">
-          <DataTable
-            columns={columns}
-            data={filteredData}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            selectable={true}
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-          />
+          {isLoading ? (
+            <div style={{ padding: '20px', textAlign: 'center' }}>Loading events...</div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredData}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              selectable={true}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
+          )}
         </div>
       </div>
 
@@ -265,6 +353,14 @@ export default function OnlineEvents() {
         cancelText="Cancel"
         type="danger"
         icon={Trash2}
+      />
+
+      <EventBookingsModal
+        isOpen={isBookingsModalOpen}
+        onClose={() => setIsBookingsModalOpen(false)}
+        bookings={currentBookings}
+        eventName={selectedEventForBookings?.eventName}
+        onDeleteBooking={handleDeleteBooking}
       />
     </div>
   );

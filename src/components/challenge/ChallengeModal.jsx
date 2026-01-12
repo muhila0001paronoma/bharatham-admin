@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import ChallengeMobilePreview from './ChallengeMobilePreview';
 import './ChallengeModal.css';
 
-export default function ChallengeModal({ isOpen, onClose, onSave, challengeData = null }) {
+export default function ChallengeModal({ isOpen, onClose, onSave, challengeData = null, isLoading = false }) {
   const [formData, setFormData] = useState({
     challengeName: '',
     shortDescription: '',
     explanation: '',
     startDate: '',
     endDate: '',
-    duration: '',
+    timeDuration: '',
     totalPoints: '',
     active: true
   });
@@ -35,11 +35,11 @@ export default function ChallengeModal({ isOpen, onClose, onSave, challengeData 
         challengeName: challengeData.challengeName || '',
         shortDescription: challengeData.shortDescription || '',
         explanation: challengeData.explanation || '',
-        startDate: challengeData.startDate ? challengeData.startDate.split(' ')[0] : '',
-        endDate: challengeData.endDate ? challengeData.endDate.split(' ')[0] : '',
-        duration: challengeData.duration || '',
+        startDate: challengeData.startDate ? challengeData.startDate.split('T')[0] : '',
+        endDate: challengeData.endDate ? challengeData.endDate.split('T')[0] : '',
+        timeDuration: challengeData.timeDuration || '',
         totalPoints: challengeData.totalPoints || '',
-        active: challengeData.active !== undefined ? challengeData.active : true
+        active: challengeData.isActive !== undefined ? challengeData.isActive : true
       });
     } else {
       setFormData({
@@ -48,7 +48,7 @@ export default function ChallengeModal({ isOpen, onClose, onSave, challengeData 
         explanation: '',
         startDate: '',
         endDate: '',
-        duration: '',
+        timeDuration: '',
         totalPoints: '',
         active: true
       });
@@ -66,9 +66,12 @@ export default function ChallengeModal({ isOpen, onClose, onSave, challengeData 
   const handleSubmit = (e) => {
     e.preventDefault();
     const submitData = {
-      ...formData,
-      startDate: `${formData.startDate} 00:00:00`,
-      endDate: `${formData.endDate} 00:00:00`,
+      challengeName: formData.challengeName,
+      shortDescription: formData.shortDescription,
+      explanation: formData.explanation,
+      startDate: `${formData.startDate}T00:00:00`,
+      endDate: `${formData.endDate}T23:59:59`,
+      timeDuration: parseInt(formData.timeDuration) || 0,
       totalPoints: parseInt(formData.totalPoints) || 0
     };
     onSave(submitData);
@@ -170,16 +173,17 @@ export default function ChallengeModal({ isOpen, onClose, onSave, challengeData 
 
               <div className="challenge-form-row">
                 <div className="challenge-form-group">
-                  <label htmlFor="duration" className="challenge-form-label">
-                    Duration <span className="required">*</span>
+                  <label htmlFor="timeDuration" className="challenge-form-label">
+                    Time Duration (minutes) <span className="required">*</span>
                   </label>
                   <Input
-                    id="duration"
-                    name="duration"
-                    type="text"
-                    value={formData.duration}
+                    id="timeDuration"
+                    name="timeDuration"
+                    type="number"
+                    value={formData.timeDuration}
                     onChange={handleChange}
-                    placeholder="e.g., 10 Minutes"
+                    placeholder="e.g., 15"
+                    min="0"
                     required
                   />
                 </div>
@@ -215,11 +219,18 @@ export default function ChallengeModal({ isOpen, onClose, onSave, challengeData 
               </div>
 
               <div className="challenge-form-actions">
-                <button type="button" className="challenge-form-cancel-btn" onClick={onClose}>
+                <button type="button" className="challenge-form-cancel-btn" onClick={onClose} disabled={isLoading}>
                   Cancel
                 </button>
-                <button type="submit" className="challenge-form-submit-btn">
-                  {challengeData ? 'Update' : 'Add'} Challenge
+                <button type="submit" className="challenge-form-submit-btn" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin mr-2" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>{challengeData ? 'Update' : 'Add'} Challenge</>
+                  )}
                 </button>
               </div>
             </form>

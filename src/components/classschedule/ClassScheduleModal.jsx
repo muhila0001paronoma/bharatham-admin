@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { courseService } from '../../services/courseService';
 import './ClassScheduleModal.css';
 
 export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleData = null }) {
   const [formData, setFormData] = useState({
-    courseTitle: '',
+    courseId: '',
     date: '',
     startTime: '',
     endTime: '',
-    status: 'Upcoming',
-    active: true
+    isActive: true
   });
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      fetchCourses();
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -24,24 +27,36 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
     };
   }, [isOpen]);
 
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const response = await courseService.getAllCourses();
+      if (response.success) {
+        setCourses(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (scheduleData) {
       setFormData({
-        courseTitle: scheduleData.courseTitle || '',
+        courseId: scheduleData.courseId || '',
         date: scheduleData.date || '',
         startTime: scheduleData.startTime || '',
         endTime: scheduleData.endTime || '',
-        status: scheduleData.status || 'Upcoming',
-        active: scheduleData.active !== undefined ? scheduleData.active : true
+        isActive: scheduleData.isActive !== undefined ? scheduleData.isActive : true
       });
     } else {
       setFormData({
-        courseTitle: '',
+        courseId: '',
         date: '',
         startTime: '',
         endTime: '',
-        status: 'Upcoming',
-        active: true
+        isActive: true
       });
     }
   }, [scheduleData, isOpen]);
@@ -77,18 +92,25 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
           <div className="schedule-modal-form-section">
             <form onSubmit={handleSubmit} className="theory-form">
               <div className="theory-form-group">
-                <label htmlFor="courseTitle" className="theory-form-label">
-                  Course Title
+                <label htmlFor="courseId" className="theory-form-label">
+                  Course
                 </label>
-                <input
-                  id="courseTitle"
-                  name="courseTitle"
-                  type="text"
-                  value={formData.courseTitle}
+                <select
+                  id="courseId"
+                  name="courseId"
+                  value={formData.courseId}
                   onChange={handleChange}
-                  placeholder="Enter course title"
                   required
-                />
+                  className="theory-form-select"
+                  disabled={loading}
+                >
+                  <option value="">Select a course</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.title || course.courseTitle || course.id}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="theory-form-group">
@@ -113,6 +135,7 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
                   id="startTime"
                   name="startTime"
                   type="time"
+                  step="1"
                   value={formData.startTime}
                   onChange={handleChange}
                   required
@@ -127,6 +150,7 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
                   id="endTime"
                   name="endTime"
                   type="time"
+                  step="1"
                   value={formData.endTime}
                   onChange={handleChange}
                   required
@@ -134,30 +158,11 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
               </div>
 
               <div className="theory-form-group">
-                <label htmlFor="status" className="theory-form-label">
-                  Status
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  required
-                  className="theory-form-select"
-                >
-                  <option value="Upcoming">Upcoming</option>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              <div className="theory-form-group">
                 <label className="theory-form-checkbox-label">
                   <input
                     type="checkbox"
-                    name="active"
-                    checked={formData.active}
+                    name="isActive"
+                    checked={formData.isActive}
                     onChange={handleChange}
                     className="theory-form-checkbox"
                   />
@@ -169,7 +174,7 @@ export default function ClassScheduleModal({ isOpen, onClose, onSave, scheduleDa
                 <button type="button" className="theory-form-cancel-btn" onClick={onClose}>
                   Cancel
                 </button>
-                <button type="submit" className="theory-form-submit-btn">
+                <button type="submit" className="theory-form-submit-btn" disabled={loading}>
                   {scheduleData ? 'Update' : 'Add'} Schedule
                 </button>
               </div>

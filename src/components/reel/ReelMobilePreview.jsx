@@ -6,7 +6,7 @@ export default function ReelMobilePreview({ formData }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    if (videoRef.current && formData.videoUrl) {
+    if (videoRef.current && formData.reelUrl) {
       const video = videoRef.current;
       // Ensure video plays
       const playPromise = video.play();
@@ -17,7 +17,7 @@ export default function ReelMobilePreview({ formData }) {
         });
       }
     }
-  }, [formData.videoUrl]);
+  }, [formData.reelUrl]);
 
   return (
     <div className="reel-mobile-preview-container">
@@ -36,10 +36,10 @@ export default function ReelMobilePreview({ formData }) {
         <div className="reel-mobile-content">
           {/* Video Area */}
           <div className="reel-mobile-video-container">
-            {formData.videoUrl ? (
+            {formData.reelUrl ? (
               <video
                 ref={videoRef}
-                src={formData.videoUrl}
+                src={formData.reelUrl}
                 className="reel-mobile-video"
                 autoPlay
                 loop
@@ -61,7 +61,7 @@ export default function ReelMobilePreview({ formData }) {
               <div className="reel-mobile-action-icon">
                 <Heart size={28} fill="#FFFFFF" color="#FFFFFF" />
               </div>
-              <div className="reel-mobile-action-count">{formData.likes || 0}</div>
+              <div className="reel-mobile-action-count">{formData.likeCount || 0}</div>
             </div>
             <div className="reel-mobile-action-item">
               <div className="reel-mobile-action-icon">
@@ -73,13 +73,13 @@ export default function ReelMobilePreview({ formData }) {
               <div className="reel-mobile-action-icon">
                 <Share2 size={28} color="#FFFFFF" />
               </div>
-              <div className="reel-mobile-action-count">{formData.shares || 0}</div>
+              <div className="reel-mobile-action-count">{formData.shareCount || 0}</div>
             </div>
           </div>
 
           {/* Bottom Info */}
           <div className="reel-mobile-info">
-            <div className="reel-mobile-title">{formData.title || 'Reel Title'}</div>
+            <div className="reel-mobile-title">{formData.reelTitle || 'Reel Title'}</div>
             {formData.uploadedBy && (
               <div className="reel-mobile-uploader">@{formData.uploadedBy.split('@')[0]}</div>
             )}
