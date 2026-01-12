@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, X, Upload, Users, GraduationCap, TrendingUp, UserCheck } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import TeacherMobilePreview from '../../components/teachers/TeacherMobilePreview';
-import { getTeachersDetails } from '../../data/data.js';
+import { teacherService } from '../../services/teacherService';
 import './TeachersDetails.css';
 import '../../components/ui/DataTable.css';
 
@@ -10,6 +10,8 @@ const TeachersDetails = () => {
   const [rows, setRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [pageSize, setPageSize] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -22,14 +24,29 @@ const TeachersDetails = () => {
     phone: '',
     specialization: '',
     position: '',
+    bio: '',
+    rating: 0,
+    totalStudents: 0,
     active: true,
-    image: null
+    image: null,
+    imageFile: null
   });
 
   useEffect(() => {
     const loadTeachers = async () => {
-      const teachers = await getTeachersDetails();
-      setRows(teachers);
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await teacherService.getAll();
+        if (response.success && response.data) {
+          setRows(response.data);
+        }
+      } catch (err) {
+        console.error('Error loading teachers:', err);
+        setError('Failed to load teachers. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     };
     loadTeachers();
   }, []);
@@ -44,9 +61,13 @@ const TeachersDetails = () => {
         email: teacher.email,
         phone: teacher.phone,
         specialization: teacher.specialization,
-        position: teacher.position,
-        active: teacher.active,
-        image: teacher.image
+        position: teacher.title || '',
+        bio: teacher.bio || '',
+        rating: teacher.rating || 0,
+        totalStudents: teacher.totalStudents || 0,
+        active: teacher.isActive,
+        image: teacher.avatarUrl,
+        imageFile: null
       });
     } else {
       setSelectedTeacher(null);
@@ -57,8 +78,12 @@ const TeachersDetails = () => {
         phone: '',
         specialization: '',
         position: '',
+        bio: '',
+        rating: 0,
+        totalStudents: 0,
         active: true,
-        image: null
+        image: null,
+        imageFile: null
       });
     }
     setShowModal(true);
@@ -69,30 +94,87 @@ const TeachersDetails = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (modalMode === 'add') {
-      const newTeacher = {
-        ...form,
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1
-      };
-      setRows([...rows, newTeacher]);
+    const { name, value, type, checked, files } = e.target;
+    if (type === 'file' && files && files[0]) {
+      const file = files[0];
+      setForm(prev => ({
+        ...prev,
+        imageFile: file,
+        image: URL.createObjectURL(file)
+      }));
     } else {
-      setRows(rows.map(r => r.id === selectedTeacher.id ? { ...form, id: r.id } : r));
+      setForm(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
     }
-    handleCloseModal();
   };
 
-  const handleDelete = (row) => {
-    if (window.confirm('Are you sure you want to delete this teacher?')) {
-      setRows(rows.filter(r => r.id !== row.id));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const teacherData = {
+        name: form.name,
+        title: form.position,
+        experience: form.experience,
+        specialization: form.specialization,
+        bio: form.bio,
+        email: form.email,
+        phone: form.phone,
+        rating: parseFloat(form.rating),
+        totalStudents: parseInt(form.totalStudents),
+        isActive: form.active,
+        imageFile: form.imageFile
+      };
+
+      let response;
+      if (modalMode === 'edit' && selectedTeacher) {
+        response = await teacherService.update(selectedTeacher.id, teacherData);
+      } else {
+        response = await teacherService.create(teacherData);
+      }
+
+      if (response.success) {
+        // Reload teachers
+        const teachersResponse = await teacherService.getAll();
+        if (teachersResponse.success && teachersResponse.data) {
+          setRows(teachersResponse.data);
+        }
+        handleCloseModal();
+      } else {
+        setError(response.message || 'Failed to save teacher');
+      }
+    } catch (err) {
+      console.error('Error saving teacher:', err);
+      setError('Failed to save teacher. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    if (!window.confirm(`Are you sure you want to delete ${row.name}?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await teacherService.delete(row.id);
+      if (response.success) {
+        // Reload teachers
+        const teachersResponse = await teacherService.getAll();
+        if (teachersResponse.success && teachersResponse.data) {
+          setRows(teachersResponse.data);
+        }
+      } else {
+        setError(response.message || 'Failed to delete teacher');
+      }
+    } catch (err) {
+      console.error('Error deleting teacher:', err);
+      setError('Failed to delete teacher. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,12 +237,12 @@ const TeachersDetails = () => {
       sortable: true,
     },
     {
-      key: 'position',
+      key: 'title',
       label: 'POSITION',
       sortable: true,
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       render: (value) => (
@@ -172,7 +254,7 @@ const TeachersDetails = () => {
   ];
 
   const totalTeachers = rows.length;
-  const activeTeachers = rows.filter(r => r.active).length;
+  const activeTeachers = rows.filter(r => r.isActive).length;
 
   return (
     <div className="teachers-details-page">
@@ -237,17 +319,22 @@ const TeachersDetails = () => {
           </div>
         </div>
 
-        <div className="theory-table-container">
-          <DataTable
-            columns={columns}
-            data={filteredData}
-            onEdit={(row) => handleOpenModal('edit', row)}
-            onDelete={handleDelete}
-            selectable={true}
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-          />
-        </div>
+        {loading && <div className="quiz-loading">Loading teachers...</div>}
+        {error && <div className="quiz-error">{error}</div>}
+
+        {!loading && !error && (
+          <div className="theory-table-container">
+            <DataTable
+              columns={columns}
+              data={filteredData}
+              onEdit={(row) => handleOpenModal('edit', row)}
+              onDelete={handleDelete}
+              selectable={true}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
+          </div>
+        )}
       </div>
 
       {showModal && (
@@ -269,13 +356,31 @@ const TeachersDetails = () => {
                   <div className="teacher-modal-field">
                     <label>Teacher Image</label>
                     <div className="image-upload-wrapper">
-                      <div className="upload-icon-box">
-                        <Upload size={20} />
-                      </div>
-                      <div className="upload-text">
-                        <span>Click to upload</span>
-                        <span>JPG, PNG or GIF (max. 2MB)</span>
-                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleChange}
+                        style={{ display: 'none' }}
+                        id="imageUpload"
+                      />
+                      <label htmlFor="imageUpload" style={{ cursor: 'pointer', width: '100%' }}>
+                        {form.image ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <img src={form.image} alt="Preview" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover' }} />
+                            <span>Click to change image</span>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="upload-icon-box">
+                              <Upload size={20} />
+                            </div>
+                            <div className="upload-text">
+                              <span>Click to upload</span>
+                              <span>JPG, PNG or GIF (max. 2MB)</span>
+                            </div>
+                          </>
+                        )}
+                      </label>
                     </div>
                   </div>
 
@@ -383,8 +488,8 @@ const TeachersDetails = () => {
 
             <div className="teacher-modal-actions">
               <button type="button" className="modal-btn cancel" onClick={handleCloseModal}>Cancel</button>
-              <button type="submit" form="teacherForm" className="modal-btn save">
-                {modalMode === 'edit' ? 'Update Teacher' : 'Save Teacher'}
+              <button type="submit" form="teacherForm" className="modal-btn save" disabled={loading}>
+                {loading ? 'Saving...' : (modalMode === 'edit' ? 'Update Teacher' : 'Save Teacher')}
               </button>
             </div>
           </div>
