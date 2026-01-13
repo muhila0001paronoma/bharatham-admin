@@ -22,6 +22,22 @@ export const userService = {
         }
     },
 
+    // Alias for getAll to support existing components
+    getAllUsers: async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/users`, {
+                headers: {
+                    ...getAuthHeader(),
+                },
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw error;
+        }
+    },
+
     // Get user by Email
     getByEmail: async (email) => {
         try {

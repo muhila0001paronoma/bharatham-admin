@@ -175,6 +175,15 @@
   color: #ffffff;
 }
 
+.games-list-loading,
+.games-questions-loading {
+  padding: 2rem;
+  text-align: center;
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
 .games-list-empty {
   padding: 2rem;
   text-align: center;
@@ -503,4 +512,3 @@
     flex: 1;
   }
 }
-

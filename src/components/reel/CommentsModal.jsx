@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { X, Heart } from 'lucide-react';
-import { reelsData } from '../../data/data';
+import { X, Heart, Trash2 } from 'lucide-react';
+import { reelService } from '../../services/reelService';
 import './CommentsModal.css';
 
 export default function CommentsModal({ isOpen, onClose, reel }) {
   const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (isOpen && reel) {
-      const reelComments = reelsData.comments[reel.id] || [];
-      setComments(reelComments);
+      fetchComments();
     }
   }, [isOpen, reel]);
+
+  const fetchComments = async () => {
+    setLoading(true);
+    try {
+      const response = await reelService.getCommentsByReel(reel.id);
+      if (response.success) {
+        setComments(response.data || []);
+      } else {
+        setError(response.message || 'Failed to fetch comments');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching comments');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -25,17 +43,37 @@ export default function CommentsModal({ isOpen, onClose, reel }) {
     };
   }, [isOpen]);
 
+  const handleDeleteComment = async (commentId) => {
+    if (window.confirm('Are you sure you want to delete this comment?')) {
+      try {
+        const response = await reelService.deleteComment(commentId);
+        if (response.success) {
+          fetchComments();
+        } else {
+          alert(response.message || 'Failed to delete comment');
+        }
+      } catch (err) {
+        console.error('Error deleting comment:', err);
+        alert('An error occurred while deleting the comment');
+      }
+    }
+  };
+
   const formatDate = (dateString) => {
-    if (!dateString) return '';
-    // Handle 'YYYY-MM-DD HH:MM:SS' format
-    const date = new Date(dateString.replace(' ', 'T'));
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return dateString;
+    }
   };
 
   if (!isOpen || !reel) return null;
@@ -46,7 +84,7 @@ export default function CommentsModal({ isOpen, onClose, reel }) {
         <div className="comments-modal-header">
           <div>
             <h2 className="comments-modal-title">Comments</h2>
-            <p className="comments-modal-subtitle">{reel.title}</p>
+            <p className="comments-modal-subtitle">{reel.reelTitle}</p>
           </div>
           <button className="comments-modal-close" onClick={onClose}>
             <X size={20} />
@@ -54,7 +92,11 @@ export default function CommentsModal({ isOpen, onClose, reel }) {
         </div>
 
         <div className="comments-modal-body">
-          {comments.length === 0 ? (
+          {loading ? (
+            <div className="comments-loading">Loading comments...</div>
+          ) : error ? (
+            <div className="comments-error">{error}</div>
+          ) : comments.length === 0 ? (
             <div className="comments-empty-state">
               <p>No comments yet</p>
             </div>
@@ -63,21 +105,27 @@ export default function CommentsModal({ isOpen, onClose, reel }) {
               {comments.map((comment) => (
                 <div key={comment.id} className="comment-item">
                   <div className="comment-avatar">
-                    {comment.userName.charAt(0).toUpperCase()}
+                    {(comment.commentedBy || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="comment-content">
                     <div className="comment-header">
                       <div className="comment-user-info">
-                        <span className="comment-user-name">{comment.userName}</span>
-                        <span className="comment-user-email">{comment.userEmail}</span>
+                        <span className="comment-user-email">{comment.commentedBy}</span>
                       </div>
                       <span className="comment-date">{formatDate(comment.commentedAt)}</span>
                     </div>
                     <div className="comment-text">{comment.comment}</div>
                     <div className="comment-footer">
-                      <button className="comment-like-btn">
-                        <Heart size={14} />
-                        <span>{comment.likes}</span>
+                      <div className="comment-likes">
+                        <Heart size={18} className="comment-heart-icon" />
+                        <span>{comment.commentLikes || 0}</span>
+                      </div>
+                      <button
+                        className="comment-delete-btn"
+                        onClick={() => handleDeleteComment(comment.id)}
+                        title="Delete Comment"
+                      >
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </div>

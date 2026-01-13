@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit2, Trash2, Calendar, FileText, TrendingUp, Users } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import ClassScheduleModal from '../components/classschedule/ClassScheduleModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { classScheduleData } from '../data/data';
+import { courseScheduleService } from '../services/courseScheduleService';
+import { courseService } from '../services/courseService';
 import './ClassSchedule.css';
 
 const ClassSchedule = () => {
@@ -14,16 +15,49 @@ const ClassSchedule = () => {
   const [selectedScheduleData, setSelectedScheduleData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [schedules, setSchedules] = useState([]);
+  const [courses, setCourses] = useState([]);
 
-  const [schedules, setSchedules] = useState(classScheduleData.schedules || []);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [schedulesRes, coursesRes] = await Promise.all([
+        courseScheduleService.getAllSchedules(),
+        courseService.getAllCourses()
+      ]);
+
+      if (schedulesRes.success) {
+        setSchedules(schedulesRes.data);
+      }
+      if (coursesRes.success) {
+        setCourses(coursesRes.data);
+      }
+    } catch (err) {
+      setError('An error occurred while fetching data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCourseTitle = (courseId) => {
+    const course = courses.find(c => c.id === courseId);
+    return course ? (course.title || course.courseTitle) : courseId;
+  };
 
   const filteredData = schedules.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
+    const courseTitle = getCourseTitle(item.courseId).toLowerCase();
     return (
-      item.courseTitle.toLowerCase().includes(query) ||
-      item.status.toLowerCase().includes(query) ||
-      item.date.toLowerCase().includes(query)
+      courseTitle.includes(query) ||
+      (item.date && item.date.toLowerCase().includes(query))
     );
   });
 
@@ -36,11 +70,11 @@ const ClassSchedule = () => {
       render: (value, row, index) => index + 1
     },
     {
-      key: 'courseTitle',
-      label: 'COURSE TITLE',
+      key: 'courseId',
+      label: 'COURSE',
       sortable: true,
       width: '250px',
-      render: (value) => <div className="font-medium text-gray-900">{value}</div>
+      render: (value) => <div className="font-medium text-gray-900">{getCourseTitle(value)}</div>
     },
     {
       key: 'date',
@@ -64,18 +98,7 @@ const ClassSchedule = () => {
       render: (value) => <div className="text-gray-600">{value}</div>
     },
     {
-      key: 'status',
-      label: 'STATUS',
-      sortable: true,
-      width: '120px',
-      render: (value) => (
-        <span className="text-gray-600">
-          {value}
-        </span>
-      )
-    },
-    {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       width: '100px',
@@ -97,24 +120,29 @@ const ClassSchedule = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveSchedule = (formData) => {
-    if (selectedScheduleData) {
-      setSchedules(prev => 
-        prev.map(item => 
-          item.id === selectedScheduleData.id 
-            ? { ...item, ...formData }
-            : item
-        )
-      );
-    } else {
-      const newSchedule = {
-        id: schedules.length + 1,
-        ...formData
-      };
-      setSchedules(prev => [...prev, newSchedule]);
+  const handleSaveSchedule = async (formData) => {
+    try {
+      if (selectedScheduleData) {
+        const response = await courseScheduleService.updateSchedule(selectedScheduleData.id, formData);
+        if (response.success) {
+          fetchData();
+        } else {
+          alert(response.message || 'Failed to update schedule');
+        }
+      } else {
+        const response = await courseScheduleService.createSchedule(formData);
+        if (response.success) {
+          fetchData();
+        } else {
+          alert(response.message || 'Failed to create schedule');
+        }
+      }
+      setIsModalOpen(false);
+      setSelectedScheduleData(null);
+    } catch (err) {
+      console.error('Error saving schedule:', err);
+      alert('An error occurred while saving the schedule');
     }
-    setIsModalOpen(false);
-    setSelectedScheduleData(null);
   };
 
   const handleCloseModal = () => {
@@ -127,10 +155,21 @@ const ClassSchedule = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      setSchedules(prev => prev.filter(item => item.id !== itemToDelete.id));
-      setItemToDelete(null);
+      try {
+        const response = await courseScheduleService.deleteSchedule(itemToDelete.id);
+        if (response.success) {
+          fetchData();
+        } else {
+          alert(response.message || 'Failed to delete schedule');
+        }
+        setItemToDelete(null);
+        setIsDeleteModalOpen(false);
+      } catch (err) {
+        console.error('Error deleting schedule:', err);
+        alert('An error occurred while deleting the schedule');
+      }
     }
   };
 
@@ -144,7 +183,7 @@ const ClassSchedule = () => {
   };
 
   const totalSchedules = schedules.length;
-  const activeSchedules = schedules.filter(item => item.active).length;
+  const activeSchedules = schedules.filter(item => item.isActive).length;
   const upcomingSchedules = schedules.filter(item => item.status === 'Upcoming').length;
 
   return (

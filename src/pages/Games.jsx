@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, Pencil, ExternalLink } from 'lucide-react';
 import GameModal from '../components/game/GameModal';
 import QuestionModal from '../components/game/QuestionModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { gamesData } from '../data/data';
+import { gameService } from '../services/gameService';
 import './Games.css';
 
 export default function Games() {
-  const [selectedGame, setSelectedGame] = useState(gamesData.games && gamesData.games.length > 0 ? gamesData.games[0] : null);
+  const [selectedGame, setSelectedGame] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [games, setGames] = useState(gamesData.games);
+  const [games, setGames] = useState([]);
   const [questions, setQuestions] = useState(gamesData.questions);
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
   const [selectedGameData, setSelectedGameData] = useState(null);
@@ -18,14 +19,76 @@ export default function Games() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleteType, setDeleteType] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSavingGame, setIsSavingGame] = useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [isSavingQuestion, setIsSavingQuestion] = useState(false);
 
-  const filteredGames = games.filter(game => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return game.gameName.toLowerCase().includes(query);
-  });
+  useEffect(() => {
+    fetchGames();
+  }, []);
 
-  const gameQuestions = questions.filter(q => q.gameId === selectedGame?.id);
+  const fetchGames = async () => {
+    setIsLoading(true);
+    try {
+      const response = await gameService.getAllGames();
+      if (response.success) {
+        setGames(response.data);
+        if (response.data.length > 0 && !selectedGame) {
+          setSelectedGame(response.data[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch();
+      } else {
+        fetchGames();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (selectedGame) {
+      fetchQuestions(selectedGame.id);
+    }
+  }, [selectedGame]);
+
+  const fetchQuestions = async (gameId) => {
+    setIsLoadingQuestions(true);
+    try {
+      const response = await gameService.getGameDetailsByGameId(gameId);
+      if (response.success) {
+        setQuestions(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await gameService.searchGames(searchQuery);
+      if (response.success) {
+        setGames(response.data);
+      }
+    } catch (error) {
+      console.error('Error searching games:', error);
+    }
+  };
+
+  const gameQuestions = questions; // Now questions are already filtered by fetchQuestions(gameId)
 
   const handleCreateGame = () => {
     setSelectedGameData(null);
@@ -37,31 +100,26 @@ export default function Games() {
     setIsGameModalOpen(true);
   };
 
-  const handleSaveGame = (formData) => {
-    if (selectedGameData) {
-      setGames(prev => 
-        prev.map(item => 
-          item.id === selectedGameData.id 
-            ? { ...item, ...formData, active: true }
-            : item
-        )
-      );
-      if (selectedGameData.id === selectedGame?.id) {
-        setSelectedGame({ ...selectedGameData, ...formData });
+  const handleSaveGame = async (formData) => {
+    setIsSavingGame(true);
+    try {
+      let response;
+      if (selectedGameData) {
+        response = await gameService.updateGame(selectedGameData.id, formData);
+      } else {
+        response = await gameService.createGame(formData);
       }
-    } else {
-      const newGame = {
-        id: games.length + 1,
-        ...formData,
-        active: true
-      };
-      setGames(prev => [newGame, ...prev]);
-      if (!selectedGame) {
-        setSelectedGame(newGame);
+
+      if (response.success) {
+        await fetchGames();
+        setIsGameModalOpen(false);
+        setSelectedGameData(null);
       }
+    } catch (error) {
+      console.error('Error saving game:', error);
+    } finally {
+      setIsSavingGame(false);
     }
-    setIsGameModalOpen(false);
-    setSelectedGameData(null);
   };
 
   const handleCloseGameModal = () => {
@@ -80,26 +138,27 @@ export default function Games() {
     setIsQuestionModalOpen(true);
   };
 
-  const handleSaveQuestion = (formData) => {
-    if (selectedQuestionData) {
-      setQuestions(prev => 
-        prev.map(item => 
-          item.id === selectedQuestionData.id 
-            ? { ...item, ...formData, gameId: selectedGame.id, active: true }
-            : item
-        )
-      );
-    } else {
-      const newQuestion = {
-        id: questions.length + 1,
-        ...formData,
-        gameId: selectedGame.id,
-        active: true
-      };
-      setQuestions(prev => [...prev, newQuestion]);
+  const handleSaveQuestion = async (formData) => {
+    setIsSavingQuestion(true);
+    try {
+      let response;
+      const questionPayload = { ...formData, gameId: selectedGame.id };
+      if (selectedQuestionData) {
+        response = await gameService.updateGameDetail(selectedQuestionData.id, questionPayload);
+      } else {
+        response = await gameService.createGameDetail(questionPayload);
+      }
+
+      if (response.success) {
+        fetchQuestions(selectedGame.id);
+        setIsQuestionModalOpen(false);
+        setSelectedQuestionData(null);
+      }
+    } catch (error) {
+      console.error('Error saving question:', error);
+    } finally {
+      setIsSavingQuestion(false);
     }
-    setIsQuestionModalOpen(false);
-    setSelectedQuestionData(null);
   };
 
   const handleCloseQuestionModal = () => {
@@ -113,16 +172,28 @@ export default function Games() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      if (deleteType === 'game') {
-        setGames(prev => prev.filter(item => item.id !== itemToDelete.id));
-        if (selectedGame?.id === itemToDelete.id) {
-          setSelectedGame(games.find(g => g.id !== itemToDelete.id) || null);
+      try {
+        if (deleteType === 'game') {
+          const response = await gameService.deleteGame(itemToDelete.id);
+          if (response.success) {
+            setGames(prev => prev.filter(item => item.id !== itemToDelete.id));
+            if (selectedGame?.id === itemToDelete.id) {
+              const remainingGames = games.filter(g => g.id !== itemToDelete.id);
+              setSelectedGame(remainingGames.length > 0 ? remainingGames[0] : null);
+            }
+          }
+        } else {
+          const response = await gameService.deleteGameDetail(itemToDelete.id);
+          if (response.success) {
+            setQuestions(prev => prev.filter(item => item.id !== itemToDelete.id));
+          }
         }
-      } else {
-        setQuestions(prev => prev.filter(item => item.id !== itemToDelete.id));
+      } catch (error) {
+        console.error('Error deleting item:', error);
       }
+      setIsDeleteModalOpen(false);
       setItemToDelete(null);
       setDeleteType(null);
     }
@@ -166,18 +237,19 @@ export default function Games() {
             />
           </div>
           <div className="games-list">
-            {filteredGames.length > 0 ? (
-              filteredGames.map((game) => (
+            {isLoading ? (
+              <div className="games-list-loading">Loading...</div>
+            ) : games.length > 0 ? (
+              games.map((game) => (
                 <div
                   key={game.id}
                   className={`games-list-item ${selectedGame?.id === game.id ? 'games-list-item-active' : ''}`}
                   onClick={() => {
                     setSelectedGame(game);
-                    handleEditGame(game);
                   }}
                 >
                   <span className="games-list-item-name">{game.gameName}</span>
-                  <Edit2 
+                  <Edit2
                     className={`games-list-item-icon ${selectedGame?.id === game.id ? 'games-list-item-icon-active' : ''}`}
                     size={16}
                     onClick={(e) => {
@@ -209,7 +281,9 @@ export default function Games() {
           </div>
           <div className="games-questions-list">
             {selectedGame ? (
-              gameQuestions.length > 0 ? (
+              isLoadingQuestions ? (
+                <div className="games-questions-loading">Loading Questions...</div>
+              ) : gameQuestions.length > 0 ? (
                 gameQuestions.map((question, index) => (
                   <div key={question.id} className="games-question-card">
                     <div className="games-question-header">
@@ -310,6 +384,7 @@ export default function Games() {
         onSave={handleSaveGame}
         gameData={selectedGameData}
         questions={questions}
+        isLoading={isSavingGame}
       />
 
       <QuestionModal
@@ -318,6 +393,7 @@ export default function Games() {
         onSave={handleSaveQuestion}
         questionData={selectedQuestionData}
         gameId={selectedGame?.id}
+        isLoading={isSavingQuestion}
       />
 
       <ConfirmationModal
@@ -325,7 +401,7 @@ export default function Games() {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         title={deleteType === 'game' ? 'Delete Game' : 'Delete Question'}
-        message={deleteType === 'game' 
+        message={deleteType === 'game'
           ? `Are you sure you want to delete "${itemToDelete?.gameName || 'this game'}"? This action cannot be undone.`
           : `Are you sure you want to delete this question? This action cannot be undone.`}
         confirmText="Delete"

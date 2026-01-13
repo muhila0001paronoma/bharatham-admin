@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit2, Trash2, Eye, Play } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import ReelModal from '../components/reel/ReelModal';
 import CommentsModal from '../components/reel/CommentsModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { reelsData } from '../data/data';
+import { reelService } from '../services/reelService';
 import './Reels.css';
 
 export default function Reels() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [reels, setReels] = useState(reelsData.reels);
+  const [reels, setReels] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReelData, setSelectedReelData] = useState(null);
@@ -17,14 +17,37 @@ export default function Reels() {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [viewCommentsModal, setViewCommentsModal] = useState(false);
   const [selectedReelForComments, setSelectedReelForComments] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchReels();
+  }, []);
+
+  const fetchReels = async () => {
+    setLoading(true);
+    try {
+      const response = await reelService.getAllReels();
+      if (response.success) {
+        setReels(response.data);
+      } else {
+        setError(response.message || 'Failed to fetch reels');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching reels');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredData = reels.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      item.videoUrl.toLowerCase().includes(query) ||
-      item.title.toLowerCase().includes(query) ||
-      item.uploadedBy.toLowerCase().includes(query)
+      (item.reelUrl && item.reelUrl.toLowerCase().includes(query)) ||
+      (item.reelTitle && item.reelTitle.toLowerCase().includes(query)) ||
+      (item.uploadedBy && item.uploadedBy.toLowerCase().includes(query))
     );
   });
 
@@ -37,18 +60,18 @@ export default function Reels() {
       render: (value, row, index) => index + 1
     },
     {
-      key: 'videoUrl',
+      key: 'reelUrl',
       label: 'VIDEO URL',
       sortable: true,
       width: '300px',
       render: (value) => (
         <div className="reels-table-url" title={value}>
-          {value.length > 50 ? `${value.substring(0, 50)}...` : value}
+          {value && value.length > 50 ? `${value.substring(0, 50)}...` : value}
         </div>
       )
     },
     {
-      key: 'title',
+      key: 'reelTitle',
       label: 'TITLE',
       sortable: true,
       width: '200px'
@@ -63,22 +86,25 @@ export default function Reels() {
       key: 'uploadedAt',
       label: 'UPLOADED AT',
       sortable: true,
-      width: '180px'
+      width: '180px',
+      render: (value) => value ? new Date(value).toLocaleString() : 'N/A'
     },
     {
-      key: 'likes',
+      key: 'likeCount',
       label: 'LIKES',
       sortable: true,
-      width: '100px'
+      width: '100px',
+      render: (value) => value || 0
     },
     {
-      key: 'shares',
+      key: 'shareCount',
       label: 'SHARES',
       sortable: true,
-      width: '100px'
+      width: '100px',
+      render: (value) => value || 0
     },
     {
-      key: 'active',
+      key: 'isActive',
       label: 'ACTIVE',
       sortable: true,
       width: '100px',
@@ -131,24 +157,29 @@ export default function Reels() {
     setIsModalOpen(true);
   };
 
-  const handleSaveReel = (formData) => {
-    if (selectedReelData) {
-      setReels(prev => 
-        prev.map(item => 
-          item.id === selectedReelData.id 
-            ? { ...item, ...formData }
-            : item
-        )
-      );
-    } else {
-      const newReel = {
-        id: reels.length + 1,
-        ...formData
-      };
-      setReels(prev => [...prev, newReel]);
+  const handleSaveReel = async (formData) => {
+    try {
+      if (selectedReelData) {
+        const response = await reelService.updateReel(selectedReelData.id, formData);
+        if (response.success) {
+          fetchReels();
+        } else {
+          alert(response.message || 'Failed to update reel');
+        }
+      } else {
+        const response = await reelService.createReel(formData);
+        if (response.success) {
+          fetchReels();
+        } else {
+          alert(response.message || 'Failed to create reel');
+        }
+      }
+      setIsModalOpen(false);
+      setSelectedReelData(null);
+    } catch (err) {
+      console.error('Error saving reel:', err);
+      alert('An error occurred while saving the reel');
     }
-    setIsModalOpen(false);
-    setSelectedReelData(null);
   };
 
   const handleCloseModal = () => {
@@ -161,10 +192,21 @@ export default function Reels() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (itemToDelete) {
-      setReels(prev => prev.filter(item => item.id !== itemToDelete.id));
-      setItemToDelete(null);
+      try {
+        const response = await reelService.deleteReel(itemToDelete.id);
+        if (response.success) {
+          fetchReels();
+        } else {
+          alert(response.message || 'Failed to delete reel');
+        }
+        setItemToDelete(null);
+        setIsDeleteModalOpen(false);
+      } catch (err) {
+        console.error('Error deleting reel:', err);
+        alert('An error occurred while deleting the reel');
+      }
     }
   };
 
@@ -188,9 +230,9 @@ export default function Reels() {
   };
 
   const totalReels = reels.length;
-  const activeReels = reels.filter(item => item.active).length;
-  const totalLikes = reels.reduce((sum, item) => sum + item.likes, 0);
-  const totalShares = reels.reduce((sum, item) => sum + item.shares, 0);
+  const activeReels = reels.filter(item => item.isActive).length;
+  const totalLikes = reels.reduce((sum, item) => sum + (item.likeCount || 0), 0);
+  const totalShares = reels.reduce((sum, item) => sum + (item.shareCount || 0), 0);
 
   return (
     <div className="reels-page">
