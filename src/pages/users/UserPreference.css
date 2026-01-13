@@ -176,3 +176,33 @@
 .action-icon-btn.delete:hover {
     background-color: #fef2f2;
 }
+
+.question-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.question-card:hover .question-actions {
+    opacity: 1;
+}
+
+.action-icon-btn.edit-q {
+    color: #64748b;
+}
+
+.action-icon-btn.edit-q:hover {
+    background-color: #f1f5f9;
+    color: #2563eb;
+}
+
+.action-icon-btn.delete-q {
+    color: #64748b;
+}
+
+.action-icon-btn.delete-q:hover {
+    background-color: #fef2f2;
+    color: #ef4444;
+}

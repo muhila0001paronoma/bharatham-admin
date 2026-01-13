@@ -3,6 +3,8 @@ import { Search, Filter, SquarePen, Trash2, Plus } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import UserModal from '../../components/users/UserModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import UserPreferenceModal from '../../components/users/UserPreferenceModal';
+import { userService } from '../../services/userService';
 import './UserDetails.css';
 
 const UserDetails = () => {
@@ -15,64 +17,41 @@ const UserDetails = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [isPrefModalOpen, setIsPrefModalOpen] = useState(false);
+  const [prefUser, setPrefUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      firstName: 'bavi',
-      lastName: 'bavi',
-      email: 'bavi003@gmail.com',
-      phoneNumber: '+94771237894',
-      isVerified: 'True',
-      lastLoginAt: '2025-12-16 00:00:00',
-      role: 'Admin',
-      active: true
-    },
-    {
-      id: 2,
-      firstName: 'bavi',
-      lastName: 'bavi',
-      email: 'bavi003@gmail.com',
-      phoneNumber: '+94771237894',
-      isVerified: 'True',
-      lastLoginAt: '2025-12-16 00:00:00',
-      role: 'Admin',
-      active: true
-    },
-    {
-      id: 3,
-      firstName: 'bavi',
-      lastName: 'bavi',
-      email: 'bavi003@gmail.com',
-      phoneNumber: '+94771237894',
-      isVerified: 'True',
-      lastLoginAt: '2025-12-16 00:00:00',
-      role: 'Admin',
-      active: true
-    },
-    {
-      id: 4,
-      firstName: 'bavi',
-      lastName: 'bavi',
-      email: 'bavi003@gmail.com',
-      phoneNumber: '+94771237894',
-      isVerified: 'True',
-      lastLoginAt: '2025-12-16 00:00:00',
-      role: 'Admin',
-      active: true
-    },
-    {
-      id: 5,
-      firstName: 'bavi',
-      lastName: 'bavi',
-      email: 'bavi003@gmail.com',
-      phoneNumber: '+94771237894',
-      isVerified: 'True',
-      lastLoginAt: '2025-12-16 00:00:00',
-      role: 'Admin',
-      active: true
+  const [rows, setRows] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await userService.getAll();
+      if (response.success) {
+        // Map backend fields to frontend fields
+        const mappedUsers = response.data.map((user, index) => ({
+          ...user,
+          id: index + 1, // Add sequential ID for table display
+          role: user.userRole || 'user',
+          active: user.isActive,
+          isVerified: user.isEmailVerified ? 'True' : 'False'
+        }));
+        setRows(mappedUsers);
+      } else {
+        setError(response.message || 'Failed to fetch users');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching users');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  React.useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const filteredData = rows.filter(item => {
     if (!searchQuery) return true;
@@ -98,28 +77,56 @@ const UserDetails = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveUser = (formData) => {
-    if (selectedUser) {
-      setRows(prev => prev.map(row =>
-        row.id === selectedUser.id ? { ...row, ...formData } : row
-      ));
-    } else {
-      const newUser = {
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
-        lastLoginAt: 'Never', // Default for new user
-        ...formData
-      };
-      setRows(prev => [...prev, newUser]);
-    }
-    setIsUserModalOpen(false);
-    setSelectedUser(null);
+  const handleViewPreference = (user) => {
+    setPrefUser(user);
+    setIsPrefModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleSaveUser = async (formData) => {
+    try {
+      let response;
+      if (selectedUser) {
+        const updateData = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phoneNumber: formData.phoneNumber,
+          userRole: formData.role,
+          isActive: formData.active,
+          isEmailVerified: formData.isVerified === 'True'
+        };
+        response = await userService.update(selectedUser.email, updateData);
+      } else {
+        response = await userService.create(formData);
+      }
+
+      if (response.success) {
+        fetchUsers();
+        setIsUserModalOpen(false);
+        setSelectedUser(null);
+      } else {
+        alert(response.message || 'Failed to save user');
+      }
+    } catch (err) {
+      console.error('Error saving user:', err);
+      alert('An error occurred while saving the user');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
     if (userToDelete) {
-      setRows(prev => prev.filter(row => row.id !== userToDelete.id));
-      setIsDeleteModalOpen(false);
-      setUserToDelete(null);
+      try {
+        const response = await userService.delete(userToDelete.email);
+        if (response.success) {
+          fetchUsers();
+          setIsDeleteModalOpen(false);
+          setUserToDelete(null);
+        } else {
+          alert(response.message || 'Failed to delete user');
+        }
+      } catch (err) {
+        console.error('Error deleting user:', err);
+        alert('An error occurred while deleting the user');
+      }
     }
   };
 
@@ -172,8 +179,8 @@ const UserDetails = () => {
       width: '140px',
       render: (value) => (
         <div className="text-gray-500 text-xs flex flex-col items-start justify-center">
-          <span>{value.split(' ')[0]}</span>
-          <span>{value.split(' ')[1]}</span>
+          <span>{value ? value.split('T')[0] : 'Never'}</span>
+          <span>{value ? value.split('T')[1]?.split('.')[0] : ''}</span>
         </div>
       )
     },
@@ -201,7 +208,7 @@ const UserDetails = () => {
       width: '220px',
       render: (_, row) => (
         <div className="user-details-actions">
-          <button className="view-user-preference-btn" onClick={() => console.log('View User Preference', row.id)}>
+          <button className="view-user-preference-btn" onClick={() => handleViewPreference(row)}>
             View<br />User Preference
           </button>
           <button className="action-btn-edit" onClick={() => handleEditUser(row)}>
@@ -280,6 +287,13 @@ const UserDetails = () => {
         cancelText="Cancel"
         type="danger"
         icon={Trash2}
+      />
+
+      <UserPreferenceModal
+        isOpen={isPrefModalOpen}
+        onClose={() => setIsPrefModalOpen(false)}
+        userEmail={prefUser?.email}
+        userName={`${prefUser?.firstName} ${prefUser?.lastName}`}
       />
     </div>
   );
