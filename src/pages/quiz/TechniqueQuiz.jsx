@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './QuizPage.css';
+import '../../components/game/GameModal.css';
 import { techniqueQuizService } from '../../services/techniqueQuizService';
 import QuizMobilePreview from '../../components/quiz/QuizMobilePreview';
 import {
@@ -450,9 +451,9 @@ const TechniqueQuiz = () => {
               </div>
 
               {/* Right Side - Mobile Preview */}
-              <div className="quiz-modal-preview-section">
-                <div className="quiz-preview-header">
-                  <h3 className="quiz-preview-title">Mobile Preview</h3>
+              <div className="game-modal-preview-section">
+                <div className="game-preview-header">
+                  <h3 className="game-preview-title">Mobile Preview</h3>
                 </div>
                 <QuizMobilePreview formData={form} />
               </div>

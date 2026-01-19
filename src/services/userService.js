@@ -54,12 +54,14 @@ export const userService = {
         }
     },
 
-    // Create new user (using register endpoint)
+    // Create new user by admin (auto-verified, no OTP required)
+    // Uses dedicated admin endpoint: /api/v1/admin/users
     create: async (userData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            const response = await fetch(`${API_BASE_URL}/admin/users`, {
                 method: 'POST',
                 headers: {
+                    ...getAuthHeader(),
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -67,7 +69,10 @@ export const userService = {
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     password: userData.password || 'Temporary@123', // Default password if not provided
-                    phoneNumber: userData.phoneNumber
+                    phoneNumber: userData.phoneNumber,
+                    userRole: userData.role || 'user',
+                    isEmailVerified: userData.isVerified === 'True' || userData.isVerified === true || true, // Auto-verified by admin
+                    isActive: userData.active !== undefined ? userData.active : true
                 }),
             });
             const data = await response.json();
@@ -78,16 +83,25 @@ export const userService = {
         }
     },
 
-    // Update user (Assuming endpoint will be added or exists)
+    // Update user by admin
+    // Uses dedicated admin endpoint: /api/v1/admin/users/{email}
     update: async (email, userData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/users/${email}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${email}`, {
                 method: 'PUT',
                 headers: {
                     ...getAuthHeader(),
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData),
+                body: JSON.stringify({
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    phoneNumber: userData.phoneNumber,
+                    userRole: userData.userRole,
+                    isEmailVerified: userData.isEmailVerified,
+                    isActive: userData.isActive,
+                    password: userData.password // Optional password update
+                }),
             });
             const data = await response.json();
             return data;
@@ -97,10 +111,11 @@ export const userService = {
         }
     },
 
-    // Delete user (Assuming endpoint will be added or exists)
+    // Delete user by admin
+    // Uses dedicated admin endpoint: /api/v1/admin/users/{email}
     delete: async (email) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/users/${email}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${email}`, {
                 method: 'DELETE',
                 headers: {
                     ...getAuthHeader(),

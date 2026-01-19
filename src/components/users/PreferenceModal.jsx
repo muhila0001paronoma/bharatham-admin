@@ -1,73 +1,98 @@
-
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Input } from '../ui/input';
-import '../theory/TheoryModal.css'; // Reusing styles
+import './PreferenceModal.css';
 
-export default function PreferenceModal({ isOpen, onClose, onSave, initialData = null, title = '', label = '', placeholder = '' }) {
-    const [value, setValue] = useState('');
+export default function PreferenceModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData = '',
+  title = 'Add Item',
+  label = 'Text',
+  placeholder = 'Enter text here...'
+}) {
+  const [text, setText] = useState('');
 
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      setText(initialData || '');
+    } else {
+      document.body.style.overflow = 'unset';
+    }
 
-    useEffect(() => {
-        setValue(initialData ? (typeof initialData === 'string' ? initialData : initialData.text || initialData.question || '') : '');
-    }, [initialData, isOpen]);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave(value);
+    return () => {
+      document.body.style.overflow = 'unset';
     };
+  }, [isOpen, initialData]);
 
-    if (!isOpen) return null;
+  const handleChange = (e) => {
+    setText(e.target.value);
+  };
 
-    return (
-        <div className="theory-modal-overlay" onClick={onClose}>
-            <div className="theory-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', height: 'auto', minHeight: 'auto' }}>
-                <div className="theory-modal-header">
-                    <h2 className="theory-modal-title">{title}</h2>
-                    <button className="theory-modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </div>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (text.trim()) {
+      onSave(text.trim());
+    }
+  };
 
-                <div className="theory-modal-body" style={{ flexDirection: 'column' }}>
-                    <div className="theory-modal-form-section" style={{ width: '100%', padding: '0', border: 'none' }}>
-                        <form onSubmit={handleSubmit} className="theory-form">
-                            <div className="theory-form-group">
-                                <label className="theory-form-label">
-                                    {label}
-                                </label>
-                                <Input
-                                    type="text"
-                                    value={value}
-                                    onChange={(e) => setValue(e.target.value)}
-                                    placeholder={placeholder}
-                                    required
-                                    autoFocus
-                                />
-                            </div>
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
-                            <div className="theory-form-actions">
-                                <button type="button" className="theory-form-cancel-btn" onClick={onClose}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className="theory-form-submit-btn">
-                                    Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+  if (!isOpen) return null;
+
+  return (
+    <div className="preference-modal-overlay" onClick={handleOverlayClick}>
+      <div className="preference-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="preference-modal-header">
+          <h2 className="preference-modal-title">{title}</h2>
+          <button className="preference-modal-close" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
-    );
+
+        <form onSubmit={handleSubmit} className="preference-modal-form">
+          <div className="preference-modal-body">
+            <div className="preference-form-group">
+              <label htmlFor="text-input" className="preference-form-label">
+                {label}
+              </label>
+              <Input
+                id="text-input"
+                type="text"
+                value={text}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <div className="preference-modal-actions">
+            <button
+              type="button"
+              className="preference-form-cancel-btn"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="preference-form-submit-btn"
+              disabled={!text.trim()}
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
+

@@ -16,6 +16,20 @@
     border-radius: 4px;
     background-color: #e2e8f0;
     object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teacher-table-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    background-color: #f1f5f9;
+    border-radius: 4px;
 }
 
 /* Modal Styles */

@@ -50,12 +50,12 @@ export default function TeacherMobilePreview({ formData }) {
                                 <h3 className="teacher-mobile-name">{teacherName}</h3>
                                 <p className="teacher-mobile-position">{teacherPosition}</p>
                                 <div className="teacher-mobile-rating">
-                                    <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                                    <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                                    <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                                    <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                                    <Star size={14} fill="#e2e8f0" color="#e2e8f0" />
-                                    <span>4.0</span>
+                                    <Star size={14} fill={formData.rating >= 1 ? "#fbbf24" : "#e2e8f0"} color={formData.rating >= 1 ? "#fbbf24" : "#e2e8f0"} />
+                                    <Star size={14} fill={formData.rating >= 2 ? "#fbbf24" : "#e2e8f0"} color={formData.rating >= 2 ? "#fbbf24" : "#e2e8f0"} />
+                                    <Star size={14} fill={formData.rating >= 3 ? "#fbbf24" : "#e2e8f0"} color={formData.rating >= 3 ? "#fbbf24" : "#e2e8f0"} />
+                                    <Star size={14} fill={formData.rating >= 4 ? "#fbbf24" : "#e2e8f0"} color={formData.rating >= 4 ? "#fbbf24" : "#e2e8f0"} />
+                                    <Star size={14} fill={formData.rating >= 5 ? "#fbbf24" : "#e2e8f0"} color={formData.rating >= 5 ? "#fbbf24" : "#e2e8f0"} />
+                                    <span>{formData.rating || '0.0'}</span>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +101,7 @@ export default function TeacherMobilePreview({ formData }) {
                         <div className="teacher-mobile-section">
                             <h4 className="teacher-mobile-section-title">About Teacher</h4>
                             <p className="teacher-mobile-bio">
-                                Experienced Bharatanatyam instructor dedicated to preserving classical traditions while inspiring modern students' growth.
+                                {formData.bio || 'Experienced Bharatanatyam instructor dedicated to preserving classical traditions while inspiring modern students\' growth.'}
                             </p>
                         </div>
 

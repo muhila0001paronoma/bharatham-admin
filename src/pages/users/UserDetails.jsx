@@ -82,21 +82,43 @@ const UserDetails = () => {
     setIsPrefModalOpen(true);
   };
 
+  /**
+   * Handle save user - integrates with AdminUserRequest model
+   * For CREATE: Requires firstName, lastName, email, password, phoneNumber
+   * For UPDATE: All fields optional (partial updates supported)
+   */
   const handleSaveUser = async (formData) => {
     try {
       let response;
       if (selectedUser) {
+        // UPDATE operation - AdminUserRequest with optional fields
+        // Email is passed as path variable, not in request body
         const updateData = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phoneNumber: formData.phoneNumber,
-          userRole: formData.role,
-          isActive: formData.active,
-          isEmailVerified: formData.isVerified === 'True'
+          firstName: formData.firstName || undefined,
+          lastName: formData.lastName || undefined,
+          phoneNumber: formData.phoneNumber || undefined,
+          userRole: formData.role || undefined,
+          isActive: formData.active !== undefined ? formData.active : undefined,
+          isEmailVerified: formData.isVerified === 'True' ? true : formData.isVerified === 'False' ? false : undefined
         };
+        // Remove undefined fields for cleaner request
+        Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+        
         response = await userService.update(selectedUser.email, updateData);
       } else {
-        response = await userService.create(formData);
+        // CREATE operation - AdminUserRequest with required fields
+        // Auto-verified by admin (isEmailVerified = true by default)
+        const createData = {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          password: formData.password || 'Temporary@123', // Default password if not provided
+          phoneNumber: formData.phoneNumber,
+          userRole: formData.role || 'user',
+          isEmailVerified: formData.isVerified === 'True' || true, // Auto-verified by admin
+          isActive: formData.active !== undefined ? formData.active : true
+        };
+        response = await userService.create(createData);
       }
 
       if (response.success) {
@@ -108,7 +130,8 @@ const UserDetails = () => {
       }
     } catch (err) {
       console.error('Error saving user:', err);
-      alert('An error occurred while saving the user');
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred while saving the user';
+      alert(errorMessage);
     }
   };
 
