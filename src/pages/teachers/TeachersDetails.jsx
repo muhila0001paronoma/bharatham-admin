@@ -122,8 +122,8 @@ const TeachersDetails = () => {
         bio: form.bio,
         email: form.email,
         phone: form.phone,
-        rating: parseFloat(form.rating),
-        totalStudents: parseInt(form.totalStudents),
+        rating: parseFloat(form.rating) || 0,
+        totalStudents: parseInt(form.totalStudents) || 0,
         isActive: form.active,
         imageFile: form.imageFile
       };
@@ -185,7 +185,7 @@ const TeachersDetails = () => {
       item.name.toLowerCase().includes(query) ||
       item.email.toLowerCase().includes(query) ||
       item.specialization.toLowerCase().includes(query) ||
-      item.position.toLowerCase().includes(query)
+      (item.title && item.title.toLowerCase().includes(query))
     );
   });
 
@@ -197,7 +197,7 @@ const TeachersDetails = () => {
       width: '60px',
     },
     {
-      key: 'image',
+      key: 'avatarUrl',
       label: 'IMAGE',
       sortable: false,
       width: '100px',
@@ -206,7 +206,9 @@ const TeachersDetails = () => {
           {value ? (
             <img src={value} alt="Teacher" className="teacher-table-image" />
           ) : (
-            <div className="teacher-table-image" />
+            <div className="teacher-table-image-placeholder">
+              <Users size={20} />
+            </div>
           )}
         </div>
       )
@@ -461,6 +463,49 @@ const TeachersDetails = () => {
                         <option value="Assistant">Assistant</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div className="teacher-modal-row">
+                    <div className="teacher-modal-field">
+                      <label htmlFor="rating">Initial Rating</label>
+                      <input
+                        type="number"
+                        id="rating"
+                        name="rating"
+                        value={form.rating}
+                        onChange={handleChange}
+                        step="0.1"
+                        min="0"
+                        max="5"
+                        placeholder="e.g. 4.5"
+                        required
+                      />
+                    </div>
+                    <div className="teacher-modal-field">
+                      <label htmlFor="totalStudents">Total Students</label>
+                      <input
+                        type="number"
+                        id="totalStudents"
+                        name="totalStudents"
+                        value={form.totalStudents}
+                        onChange={handleChange}
+                        placeholder="e.g. 150"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="teacher-modal-field">
+                    <label htmlFor="bio">Biography</label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      value={form.bio}
+                      onChange={handleChange}
+                      placeholder="Enter teacher's biography and professional background..."
+                      rows={4}
+                      required
+                    />
                   </div>
 
                   <div className="teacher-modal-field">

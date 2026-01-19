@@ -2,67 +2,56 @@ import React, { useState } from 'react';
 import { Plus, SquarePen, Trash2 } from 'lucide-react';
 import PreferenceModal from '../../components/users/PreferenceModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { userPreferenceService } from '../../services/userPreferenceService';
 import './UserPreference.css';
 
 const UserPreference = () => {
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      question: "What is your learning level?",
-      answers: [
-        { id: 1, text: "Beginner" },
-        { id: 2, text: "Intermediate" },
-        { id: 3, text: "Advanced" }
-      ]
-    },
-    {
-      id: 2,
-      question: "How long is your dance experience?",
-      answers: [
-        { id: 1, text: "No Experience" },
-        { id: 2, text: "1 - 2 Years" },
-        { id: 3, text: "2 - 5 Years" },
-        { id: 4, text: "5+ Years" }
-      ]
-    },
-    {
-      id: 3,
-      question: "Your Focus Areas?",
-      answers: [
-        { id: 1, text: "Nritta" },
-        { id: 2, text: "Abhinayam" },
-        { id: 3, text: "Mutras" },
-        { id: 4, text: "Footwork & Rhythm" },
-        { id: 5, text: "Varnam" }
-      ]
-    },
-    {
-      id: 4,
-      question: "How many classes do you attend weekly?",
-      answers: [
-        { id: 1, text: "1" },
-        { id: 2, text: "2" },
-        { id: 3, text: "3" },
-        { id: 4, text: "4" },
-        { id: 5, text: "5" },
-        { id: 6, text: "6" },
-        { id: 7, text: "7" }
-      ]
-    }
-  ]);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
-    type: null, // 'ADD_QUESTION', 'ADD_ANSWER', 'EDIT_ANSWER'
-    data: null, // qId for ADD_ANSWER, answer object for EDIT_ANSWER
+    type: null, // 'ADD_QUESTION', 'EDIT_QUESTION', 'ADD_ANSWER', 'EDIT_ANSWER'
+    data: null, // qId for ADD_ANSWER, answer object for EDIT_ANSWER, question object for EDIT_QUESTION
     initialValue: null
   });
 
   const [deleteConfig, setDeleteConfig] = useState({
     isOpen: false,
-    type: null, // 'ANSWER' (could extend to QUESTION later)
-    data: null // { qId, answerId, text }
+    type: null, // 'ANSWER', 'QUESTION'
+    data: null // { qId, answerId, text } or { qId, text }
   });
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      const qResponse = await userPreferenceService.getAllQuestions();
+      if (!qResponse.success) throw new Error(qResponse.message);
+
+      const qs = qResponse.data;
+      const questionsWithAnswers = await Promise.all(qs.map(async (q) => {
+        const aResponse = await userPreferenceService.getAnswersByQuestionId(q.id);
+        const answers = aResponse.success ? aResponse.data.map(a => ({ id: a.id, text: a.answer })) : [];
+        return {
+          id: q.id,
+          question: q.question,
+          answers: answers
+        };
+      }));
+
+      setQuestions(questionsWithAnswers);
+    } catch (err) {
+      setError('Failed to fetch preference data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAllData();
+  }, []);
 
   // Modal Handlers
   const openAddQuestion = () => {
@@ -71,6 +60,15 @@ const UserPreference = () => {
       type: 'ADD_QUESTION',
       data: null,
       initialValue: ''
+    });
+  };
+
+  const openEditQuestion = (q) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'EDIT_QUESTION',
+      data: q.id,
+      initialValue: q.question
     });
   };
 
@@ -96,40 +94,55 @@ const UserPreference = () => {
     setModalConfig({ isOpen: false, type: null, data: null, initialValue: null });
   };
 
-  const handleSave = (text) => {
+  const handleSave = async (text) => {
     if (!text.trim()) return;
 
-    if (modalConfig.type === 'ADD_QUESTION') {
-      const newQuestion = {
-        id: Date.now(),
-        question: text,
-        answers: []
-      };
-      setQuestions([...questions, newQuestion]);
-    } else if (modalConfig.type === 'ADD_ANSWER') {
-      const qId = modalConfig.data;
-      setQuestions(questions.map(q => {
-        if (q.id === qId) {
-          return {
-            ...q,
-            answers: [...q.answers, { id: Date.now(), text }]
-          };
+    try {
+      if (modalConfig.type === 'ADD_QUESTION') {
+        const response = await userPreferenceService.createQuestion(text);
+        if (response.success) {
+          setQuestions([...questions, { id: response.data.id, question: text, answers: [] }]);
         }
-        return q;
-      }));
-    } else if (modalConfig.type === 'EDIT_ANSWER') {
-      const { qId, answerId } = modalConfig.data;
-      setQuestions(questions.map(q => {
-        if (q.id === qId) {
-          return {
-            ...q,
-            answers: q.answers.map(a => a.id === answerId ? { ...a, text } : a)
-          };
+      } else if (modalConfig.type === 'EDIT_QUESTION') {
+        const qId = modalConfig.data;
+        const response = await userPreferenceService.updateQuestion(qId, text);
+        if (response.success) {
+          setQuestions(questions.map(q => q.id === qId ? { ...q, question: text } : q));
         }
-        return q;
-      }));
+      } else if (modalConfig.type === 'ADD_ANSWER') {
+        const qId = modalConfig.data;
+        const response = await userPreferenceService.createAnswer(qId, text);
+        if (response.success) {
+          setQuestions(questions.map(q => {
+            if (q.id === qId) {
+              return {
+                ...q,
+                answers: [...q.answers, { id: response.data.id, text }]
+              };
+            }
+            return q;
+          }));
+        }
+      } else if (modalConfig.type === 'EDIT_ANSWER') {
+        const { qId, answerId } = modalConfig.data;
+        const response = await userPreferenceService.updateAnswer(answerId, qId, text);
+        if (response.success) {
+          setQuestions(questions.map(q => {
+            if (q.id === qId) {
+              return {
+                ...q,
+                answers: q.answers.map(a => a.id === answerId ? { ...a, text } : a)
+              };
+            }
+            return q;
+          }));
+        }
+      }
+      closeModal();
+    } catch (err) {
+      console.error('Error saving:', err);
+      alert('An error occurred while saving. Please try again.');
     }
-    closeModal();
   };
 
   // Delete Handlers
@@ -141,29 +154,52 @@ const UserPreference = () => {
     });
   };
 
+  const openDeleteQuestion = (q) => {
+    setDeleteConfig({
+      isOpen: true,
+      type: 'QUESTION',
+      data: { qId: q.id, text: q.question }
+    });
+  };
+
   const closeDeleteModal = () => {
     setDeleteConfig({ isOpen: false, type: null, data: null });
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteConfig.type === 'ANSWER') {
-      const { qId, answerId } = deleteConfig.data;
-      setQuestions(questions.map(q => {
-        if (q.id === qId) {
-          return {
-            ...q,
-            answers: q.answers.filter(a => a.id !== answerId)
-          };
+  const handleConfirmDelete = async () => {
+    try {
+      if (deleteConfig.type === 'ANSWER') {
+        const { qId, answerId } = deleteConfig.data;
+        const response = await userPreferenceService.deleteAnswer(answerId);
+        if (response.success) {
+          setQuestions(questions.map(q => {
+            if (q.id === qId) {
+              return {
+                ...q,
+                answers: q.answers.filter(a => a.id !== answerId)
+              };
+            }
+            return q;
+          }));
         }
-        return q;
-      }));
+      } else if (deleteConfig.type === 'QUESTION') {
+        const { qId } = deleteConfig.data;
+        const response = await userPreferenceService.deleteQuestion(qId);
+        if (response.success) {
+          setQuestions(questions.filter(q => q.id !== qId));
+        }
+      }
+      closeDeleteModal();
+    } catch (err) {
+      console.error('Error deleting:', err);
+      alert('An error occurred while deleting. Please try again.');
     }
-    closeDeleteModal();
   };
 
   const getModalTitle = () => {
     switch (modalConfig.type) {
       case 'ADD_QUESTION': return 'Add New Question';
+      case 'EDIT_QUESTION': return 'Edit Question';
       case 'ADD_ANSWER': return 'Add New Answer';
       case 'EDIT_ANSWER': return 'Edit Answer';
       default: return '';
@@ -173,6 +209,7 @@ const UserPreference = () => {
   const getModalLabel = () => {
     switch (modalConfig.type) {
       case 'ADD_QUESTION': return 'Question Text';
+      case 'EDIT_QUESTION': return 'Question Text';
       case 'ADD_ANSWER': return 'Answer Text';
       case 'EDIT_ANSWER': return 'Answer Text';
       default: return '';
@@ -201,6 +238,14 @@ const UserPreference = () => {
                 <div className="question-info">
                   <div className="question-badge">Q{index + 1}</div>
                   <span className="question-text">{q.question}</span>
+                  <div className="question-actions">
+                    <button className="action-icon-btn edit-q" onClick={() => openEditQuestion(q)} title="Edit Question">
+                      <SquarePen size={14} />
+                    </button>
+                    <button className="action-icon-btn delete-q" onClick={() => openDeleteQuestion(q)} title="Delete Question">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
                 <button className="add-answer-btn" onClick={() => openAddAnswer(q.id)}>
                   <Plus size={14} />
@@ -242,8 +287,8 @@ const UserPreference = () => {
         isOpen={deleteConfig.isOpen}
         onClose={closeDeleteModal}
         onConfirm={handleConfirmDelete}
-        title="Delete Answer"
-        message={`Are you sure you want to delete the answer "${deleteConfig.data?.text}"? This action cannot be undone.`}
+        title={deleteConfig.type === 'QUESTION' ? "Delete Question" : "Delete Answer"}
+        message={`Are you sure you want to delete the ${deleteConfig.type === 'QUESTION' ? 'question' : 'answer'} "${deleteConfig.data?.text}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         type="danger"

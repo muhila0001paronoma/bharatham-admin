@@ -10,9 +10,10 @@ export default function UserModal({ isOpen, onClose, onSave, userData = null }) 
         firstName: '',
         lastName: '',
         email: '',
+        password: '',
         phoneNumber: '',
-        isVerified: 'False',
-        role: 'Student',
+        isVerified: 'True', // Default to True (auto-verified by admin)
+        role: 'user', // Default to 'user' to match backend
         active: true
     });
 
@@ -30,23 +31,27 @@ export default function UserModal({ isOpen, onClose, onSave, userData = null }) 
 
     useEffect(() => {
         if (userData) {
+            // UPDATE mode - password field not shown (optional update)
             setFormData({
                 firstName: userData.firstName || '',
                 lastName: userData.lastName || '',
                 email: userData.email || '',
+                password: '', // Not used in update (optional)
                 phoneNumber: userData.phoneNumber || '',
-                isVerified: userData.isVerified || 'False',
-                role: userData.role || 'Student',
+                isVerified: userData.isVerified || 'True',
+                role: userData.role || 'user',
                 active: userData.active !== undefined ? userData.active : true
             });
         } else {
+            // CREATE mode - password field required
             setFormData({
                 firstName: '',
                 lastName: '',
                 email: '',
+                password: '', // Required for CREATE
                 phoneNumber: '',
-                isVerified: 'False',
-                role: 'Student',
+                isVerified: 'True', // Auto-verified by admin
+                role: 'user', // Default role
                 active: true
             });
         }
@@ -124,9 +129,28 @@ export default function UserModal({ isOpen, onClose, onSave, userData = null }) 
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Enter email address"
-                                    required
+                                    required={!userData} // Required only for CREATE
+                                    disabled={!!userData} // Disabled for UPDATE (email is path variable)
                                 />
                             </div>
+
+                            {!userData && (
+                                <div className="theory-form-group">
+                                    <label htmlFor="password" className="theory-form-label">
+                                        Password
+                                    </label>
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="Enter password (min 8 characters)"
+                                        required
+                                        minLength={8}
+                                    />
+                                </div>
+                            )}
 
                             <div className="theory-form-group">
                                 <label htmlFor="phoneNumber" className="theory-form-label">
@@ -139,6 +163,7 @@ export default function UserModal({ isOpen, onClose, onSave, userData = null }) 
                                     value={formData.phoneNumber}
                                     onChange={handleChange}
                                     placeholder="Enter phone number"
+                                    required={!userData} // Required only for CREATE
                                 />
                             </div>
 
@@ -153,9 +178,9 @@ export default function UserModal({ isOpen, onClose, onSave, userData = null }) 
                                     onChange={handleChange}
                                     className="theory-form-select"
                                 >
-                                    <option value="Student">Student</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Teacher">Teacher</option>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="teacher">Teacher</option>
                                 </select>
                             </div>
 

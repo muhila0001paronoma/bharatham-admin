@@ -376,10 +376,6 @@ const QuizResults = () => {
       <div className="theory-section">
         <div className="theory-section-header">
           <h2 className="theory-section-title">Quiz Results</h2>
-          <button className="theory-button theory-button-primary" onClick={() => openModal('add')}>
-            <Plus className="theory-button-icon" />
-            <span>Add Quiz Result</span>
-          </button>
         </div>
 
         <div className="theory-details-toolbar">
